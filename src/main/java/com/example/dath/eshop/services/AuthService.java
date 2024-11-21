@@ -16,8 +16,8 @@ public class AuthService {
     @Autowired
     private TokenService tokenService;
 
-    private final String GMAIL = "kucantscute@gmail.com";
-    private final String PASSWORD = "ugop edsx ieoo fecs";
+    private final String GMAIL = "hieuminhpham1001@gmail.com";
+    private final String PASSWORD = "gvct plak rdzn wvnw";
 
     public void sendEmail(String email) throws UserException {
         User accountForgot=this.userService.findUserByUserName(email);
