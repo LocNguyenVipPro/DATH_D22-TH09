@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class GenerateRandomNumber {
     public static final int LENGTH_TOKEN = 6;
+
     public static String generateRandomNumberString() {
         Random rand = new Random();
         StringBuilder sb = new StringBuilder(LENGTH_TOKEN);

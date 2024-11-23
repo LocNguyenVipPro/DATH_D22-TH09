@@ -1,13 +1,15 @@
 package com.example.dath.eshop.validators.constraints;
 
-import com.example.dath.eshop.services.UserService;
-import com.example.dath.eshop.validators.annotations.UserNameUnique;
+import java.lang.reflect.Field;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
+import com.example.dath.eshop.services.UserService;
+import com.example.dath.eshop.validators.annotations.UserNameUnique;
 
 public class UniqueEmailConstraint implements ConstraintValidator<UserNameUnique, Object> {
     private String idField;
@@ -41,7 +43,7 @@ public class UniqueEmailConstraint implements ConstraintValidator<UserNameUnique
         try {
             Integer id = (Integer) idField.get(value);
             String email = (String) emailField.get(value);
-            boolean isValid= this.userService.checkUserNameUni(email.trim(),id);
+            boolean isValid = this.userService.checkUserNameUni(email.trim(), id);
 
             if (!isValid) {
                 context.disableDefaultConstraintViolation();

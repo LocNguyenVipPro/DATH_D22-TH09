@@ -1,39 +1,42 @@
 package com.example.dath.eshop.services;
 
-import com.example.dath.eshop.models.Role;
-import com.example.dath.eshop.models.UserProfile;
-import com.example.dath.eshop.models.User;
-import com.example.dath.eshop.exceptions.UserException;
-import com.example.dath.eshop.mappers.UserProfileMapper;
-import com.example.dath.eshop.repositories.UserProfileRepository;
-import com.example.dath.eshop.repositories.UserRepository;
-import com.example.dath.eshop.repositories.RoleRepository;
-import com.example.dath.eshop.requests.UserProfileRequest;
+import java.util.Date;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import java.util.Date;
-import java.util.Optional;
+import com.example.dath.eshop.exceptions.UserException;
+import com.example.dath.eshop.mappers.UserProfileMapper;
+import com.example.dath.eshop.models.Role;
+import com.example.dath.eshop.models.User;
+import com.example.dath.eshop.models.UserProfile;
+import com.example.dath.eshop.repositories.RoleRepository;
+import com.example.dath.eshop.repositories.UserProfileRepository;
+import com.example.dath.eshop.repositories.UserRepository;
+import com.example.dath.eshop.requests.UserProfileRequest;
 
 @Service
 public class UserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private RoleRepository rolesRepository;
+
     @Autowired
     private UserProfileRepository userProfileRepository;
-
 
     public boolean checkUserNameUni(String userName, Integer id) {
         User user = this.userRepository.findUsersByUserName(userName);
 
-        if (id==null||id == 0 ) {
+        if (id == null || id == 0) {
             if (user != null) {
                 return false;
             }
@@ -46,9 +49,7 @@ public class UserService {
         return true;
     }
 
-
-    public User findUserByUserName(String userName)
-    {
+    public User findUserByUserName(String userName) {
         return this.userRepository.findUsersByUserName(userName);
     }
 
@@ -85,19 +86,15 @@ public class UserService {
         return this.rolesRepository.save(defaultRole);
     }
 
-
-
-    public void saveUserProfile(UserProfile userProfile)
-    {
+    public void saveUserProfile(UserProfile userProfile) {
         this.userProfileRepository.save(userProfile);
     }
 
     public User findUserById(int id) throws UserException {
         try {
             return this.userRepository.findById(id).get();
-        }catch (Exception ex)
-        {
-            throw new UserException("Cannot Find User With Id : "+id);
+        } catch (Exception ex) {
+            throw new UserException("Cannot Find User With Id : " + id);
         }
     }
 
@@ -136,7 +133,8 @@ public class UserService {
             userProfile.setCreatedAt(new Date());
             this.saveUserProfile(userProfile);
         } else {
-            UserProfile userProfileInData = this.getUserProfileById(userProfile.getId()).orElse(null);
+            UserProfile userProfileInData =
+                    this.getUserProfileById(userProfile.getId()).orElse(null);
             if (userProfileInData != null) {
                 userProfileInData.setUpdatedAt(new Date());
                 userProfileInData.setGender(userProfile.isGender());
@@ -146,7 +144,6 @@ public class UserService {
                 this.saveUserProfile(userProfileInData);
             }
         }
-
     }
 
     public void prepareFormModel(Model model, String pageTitle, boolean isNewUser) {
@@ -156,17 +153,16 @@ public class UserService {
         model.addAttribute("isNewUser", isNewUser);
     }
 
-        public void setUpToUpdateForm(Model model,UserProfile userProfile)
-        {
-            model.addAttribute("pageTitle", "Update User");
-            model.addAttribute("titleForm", "Update User Profile");
+    public void setUpToUpdateForm(Model model, UserProfile userProfile) {
+        model.addAttribute("pageTitle", "Update User");
+        model.addAttribute("titleForm", "Update User Profile");
 
-            if (userProfile == null) {
-                model.addAttribute("isCheckGenderChoose", false);
-                model.addAttribute("userProfileRequest",new UserProfileRequest());
-            } else {
-                model.addAttribute("isCheckGenderChoose", true);
-                model.addAttribute("userProfileRequest", UserProfileMapper.toUserProfileRequest(userProfile));
-            }
+        if (userProfile == null) {
+            model.addAttribute("isCheckGenderChoose", false);
+            model.addAttribute("userProfileRequest", new UserProfileRequest());
+        } else {
+            model.addAttribute("isCheckGenderChoose", true);
+            model.addAttribute("userProfileRequest", UserProfileMapper.toUserProfileRequest(userProfile));
         }
+    }
 }

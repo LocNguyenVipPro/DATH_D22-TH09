@@ -15,7 +15,7 @@ public class CategoryRequestMapper {
     }
 
     public static CategoryRequest toCategoryRequest(ProductCategory productCategory) {
-        CategoryRequest categoryRequest=new CategoryRequest();
+        CategoryRequest categoryRequest = new CategoryRequest();
         categoryRequest.setId(productCategory.getId());
         categoryRequest.setIsActive(productCategory.getIsActive());
         categoryRequest.setDescription(productCategory.getDescription());
