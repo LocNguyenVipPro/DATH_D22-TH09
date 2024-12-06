@@ -58,19 +58,33 @@ public class Product {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "products_categories",
-            joinColumns = {@JoinColumn(name = "product_categories_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
-    private Set<ProductCategory> ListProductCategories = new HashSet<>();
+            joinColumns = {@JoinColumn(name = "product_id")},
+            inverseJoinColumns = {@JoinColumn(name = "category_id")})
+    private Set<ProductCategory> listProductCategories = new HashSet<>();
 
-    public Set<ProductCategory> getListProductCategories() {
-        return ListProductCategories;
+    @Column(name = "stock_quantity") // Thêm trường stockQuantity
+    private int stockQuantity; // Định nghĩa số lượng tồn kho
+
+    public Product() {}
+
+    public Product(
+            String name, String sku, String content, float price, float discountPrice, float tax, int stockQuantity) {
+        this.name = name;
+        this.sku = sku;
+        this.content = content;
+        this.price = price;
+        this.discountPrice = discountPrice;
+        this.tax = tax;
+        this.stockQuantity = stockQuantity; // Khởi tạo số lượng tồn kho
+        this.createdAt = new Date();
     }
 
-    public void setListProductCategories(Set<ProductCategory> listProductCategories) {
-        ListProductCategories = listProductCategories;
+    // Các phương thức hỗ trợ
+    public void addProductCate(ProductCategory productCategory) {
+        this.listProductCategories.add(productCategory);
     }
 
     public String loadImages() {
@@ -81,40 +95,31 @@ public class Product {
         }
     }
 
+    // Getter và Setter cho stockQuantity
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
     @Override
     public String toString() {
         return "Product{" + "id="
                 + id + ", name='"
-                + name + '\'' + ", Sku='"
-                + sku + '\'' + ", Content='"
+                + name + '\'' + ", sku='"
+                + sku + '\'' + ", content='"
                 + content + '\'' + ", image='"
                 + image + '\'' + ", price="
-                + price + ", discount_price="
+                + price + ", discountPrice="
                 + discountPrice + ", tax="
                 + tax + ", createdAt="
                 + createdAt + ", updatedAt="
                 + updatedAt + ", deletedAt="
                 + deletedAt + ", isActive="
-                + isActive + '}';
+                + isActive + ", stockQuantity="
+                + stockQuantity + // Hiển thị stockQuantity
+                '}';
     }
-
-    public Product(String name, String sku, String content, float price, float discount_price, float tax) {
-        this.name = name;
-        sku = sku;
-        content = content;
-        this.price = price;
-        this.discountPrice = discount_price;
-        this.tax = tax;
-        this.createdAt = new Date();
-    }
-
-    public void addProductCate(ProductCategory productCategories) {
-        this.ListProductCategories.add(productCategories);
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Product() {}
 }

@@ -34,7 +34,7 @@
                                th:classappend="${#fields.hasErrors('userName')} ? 'border-red-500' : ''"
                                name="username"
                                id="username"
-                               placeholder="Username"
+                               placeholder="Enter an email"
                                th:field="*{userName}" />
                         <div th:if="${#fields.hasErrors('userName')}" class="text-red-500 italic mt-1 text-sm">
                             <span th:errors="*{userName}"></span>
@@ -58,7 +58,7 @@
                                th:classappend="${#fields.hasErrors('password')} ? 'border-red-500' : ''"
                                name="password"
                                id="password"
-                               placeholder="password"
+                               placeholder="Password"
                                th:field="*{password}" />
                         <div th:if="${#fields.hasErrors('password')}" class="text-red-500 italic mt-1 text-sm">
                             <span th:errors="*{password}"></span>
@@ -70,7 +70,7 @@
                         <input
                                 type="password"
                                 class="block border border-grey-light w-full p-3 rounded mb-4"
-                                placeholder="Repassword"
+                                placeholder="Confirm your password"
                                 id="repassword"
                         />
                     </div>
@@ -83,7 +83,7 @@
                            class="block border border-grey-light w-full p-3 rounded mb-1"
                            th:classappend="${#fields.hasErrors('password')} ? 'border-red-500' : ''"
                            id="newPassword"
-                           placeholder="Enter New Password"
+                           placeholder="Enter new password"
                            th:field="*{password}" />
                     <div th:if="${#fields.hasErrors('password')}" class="text-red-500 italic mt-1 text-sm">
                         <span th:errors="*{password}"></span>
@@ -99,7 +99,7 @@
                            th:classappend="${#fields.hasErrors('firstName')} ? 'border-red-500' : ''"
                            name="firstName"
                            id="firstName"
-                           placeholder="FirstName"
+                           placeholder="Firstname"
                            th:field="*{firstName}" />
                     <div th:if="${#fields.hasErrors('firstName')}" class="text-red-500 italic mt-1 text-sm">
                         <span th:errors="*{firstName}"></span>
@@ -111,7 +111,7 @@
                            th:classappend="${#fields.hasErrors('lastName')} ? 'border-red-500' : ''"
                            name="lastName"
                            id="lastName"
-                           placeholder="lastName"
+                           placeholder="Lastname"
                            th:field="*{lastName}" />
                     <div th:if="${#fields.hasErrors('lastName')}" class="text-red-500 italic mt-1 text-sm">
                         <span th:errors="*{lastName}"></span>
@@ -134,7 +134,7 @@
                             type="submit"
                             class="w-full px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md"
                     >
-                        Create Acount
+                        Create Account
                     </button>
                 </div>
 

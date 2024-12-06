@@ -13,7 +13,7 @@ import com.example.dath.eshop.models.OrderLineItem;
 
 @Repository
 public interface OrderLineItemRepository extends JpaRepository<OrderLineItem, Integer> {
-    public Page<OrderLineItem> findByOrderId(Order orderId, Pageable pageable);
+    Page<OrderLineItem> findByOrderId(Order order, Pageable pageable);
 
     @Query("SELECT p, SUM(oli.quantity) AS totalOrdered " + "FROM Product p "
             + "JOIN OrderLineItem oli ON p.id = oli.productId.id "

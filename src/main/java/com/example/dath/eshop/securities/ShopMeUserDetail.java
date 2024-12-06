@@ -17,31 +17,29 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ShopMeUserDetail implements UserDetails {
-    private User users;
     private static final long serialVersionUID = 8434638013158790457L;
+    private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<Role> roles = users.getListRoles();
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-        return authorities;
+        // Sử dụng Stream API để code ngắn gọn và hiệu quả hơn
+        return user.getListRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
     }
 
     public Integer getUserId() {
-        return this.users.getId();
+        return this.user.getId();
     }
 
     @Override
     public String getPassword() {
-        return this.users.getPassword();
+        return this.user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.users.getUserName();
+        return this.user.getUserName();
     }
 
     @Override
@@ -61,6 +59,6 @@ public class ShopMeUserDetail implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.users.getActive();
+        return this.user.getActive();
     }
 }

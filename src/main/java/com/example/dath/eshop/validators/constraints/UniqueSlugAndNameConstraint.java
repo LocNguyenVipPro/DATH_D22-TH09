@@ -13,47 +13,65 @@ import com.example.dath.eshop.services.ProductCategoryService;
 import com.example.dath.eshop.validators.annotations.SlugAndNameUnique;
 
 public class UniqueSlugAndNameConstraint implements ConstraintValidator<SlugAndNameUnique, Object> {
+
     @Autowired
-    private ProductCategoryService productCategoriesSerVice;
+    private ProductCategoryService productCategoryService;
 
     private String nameField;
     private String idField;
-    private String SlugField;
+    private String slugField;
 
     @Override
     public void initialize(SlugAndNameUnique constraintAnnotation) {
         this.nameField = constraintAnnotation.nameField();
         this.idField = constraintAnnotation.idField();
-        this.SlugField = constraintAnnotation.SlugField();
-        ConstraintValidator.super.initialize(constraintAnnotation);
+        this.slugField = constraintAnnotation.slugField();
     }
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true;
+            return true; // Null values are considered valid
         }
-
-        Field idField = ReflectionUtils.findField(value.getClass(), this.idField);
-        Field nameField = ReflectionUtils.findField(value.getClass(), this.nameField);
-        Field slugField = ReflectionUtils.findField(value.getClass(), this.SlugField);
-
-        if (idField == null || nameField == null || slugField == null) {
-            return false;
-        }
-
-        ReflectionUtils.makeAccessible(idField);
-        ReflectionUtils.makeAccessible(nameField);
-        ReflectionUtils.makeAccessible(slugField);
 
         try {
-            Integer id = (Integer) idField.get(value);
-            String name = (String) nameField.get(value);
-            String slug = (String) slugField.get(value);
-            return this.productCategoriesSerVice.checkNameAndSlugUnique(
-                    id, name.trim(), slug.trim(), nameField, slugField, context);
-        } catch (IllegalAccessException | ProductCategoryException e) {
-            throw new RuntimeException(e);
+            Integer id = (Integer) getField(value, idField);
+            String name = (String) getField(value, nameField);
+            String slug = (String) getField(value, slugField);
+
+            if (name == null || slug == null) {
+                return true; // Null fields are not considered as validation errors
+            }
+
+            // Convert String field names to actual Field objects
+            Field nameFieldObj = ReflectionUtils.findField(value.getClass(), nameField);
+            Field slugFieldObj = ReflectionUtils.findField(value.getClass(), slugField);
+
+            if (nameFieldObj == null || slugFieldObj == null) {
+                throw new RuntimeException("Field(s) not found on the target class");
+            }
+
+            return productCategoryService.checkNameAndSlugUnique(
+                    id, name.trim(), slug.trim(), nameFieldObj, slugFieldObj, context);
+
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error accessing fields for validation", e);
+        } catch (ProductCategoryException e) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(e.getMessage()).addConstraintViolation();
+            return false;
         }
+    }
+
+    /**
+     * Helper method to get the value of a field via reflection.
+     */
+    private Object getField(Object target, String fieldName) throws IllegalAccessException {
+        Field field = ReflectionUtils.findField(target.getClass(), fieldName);
+        if (field == null) {
+            throw new RuntimeException("Field '" + fieldName + "' not found on target class");
+        }
+        ReflectionUtils.makeAccessible(field);
+        return field.get(target);
     }
 }

@@ -26,10 +26,11 @@ public class UserProfile {
     private String bio;
 
     @NotNull
-    @Column(name = "addresss", nullable = false)
+    @Column(name = "address", nullable = false) // Fixed typo from 'addresss' to 'address'
     private String address;
 
-    private boolean gender;
+    @Column(name = "gender")
+    private boolean gender; // Using primitive type 'boolean'
 
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -41,7 +42,7 @@ public class UserProfile {
     @LastModifiedDate
     private Date updatedAt;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // Updated CascadeType
     @JoinColumn(name = "users_id")
     private User users;
 
@@ -51,20 +52,38 @@ public class UserProfile {
         this.address = address;
         this.gender = gender;
         this.users = users;
-        this.createdAt = new Date();
     }
 
     @Override
     public String toString() {
-        return "UserProfile{" + "id="
-                + id + ", phoneNumber='"
-                + phoneNumber + '\'' + ", bio='"
-                + bio + '\'' + ", address='"
-                + address + '\'' + ", gender="
-                + gender + ", createdAt="
-                + createdAt + ", updatedAt="
-                + updatedAt + ", users="
-                + users + '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("UserProfile{")
+                .append("id=")
+                .append(id)
+                .append(", phoneNumber='")
+                .append(phoneNumber)
+                .append('\'')
+                .append(", bio='")
+                .append(bio)
+                .append('\'')
+                .append(", address='")
+                .append(address)
+                .append('\'')
+                .append(", gender=")
+                .append(gender)
+                .append(", createdAt=")
+                .append(createdAt)
+                .append(", updatedAt=")
+                .append(updatedAt)
+                .append(", users=")
+                .append(users)
+                .append('}');
+        return sb.toString();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = new Date(); // Automatically set updatedAt when the entity is updated
     }
 
     public UserProfile() {}

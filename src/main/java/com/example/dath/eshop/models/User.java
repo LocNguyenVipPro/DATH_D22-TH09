@@ -1,8 +1,8 @@
 package com.example.dath.eshop.models;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.*;
 
@@ -12,10 +12,11 @@ import org.springframework.data.annotation.LastModifiedDate;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "Users")
+@Entity(name = "users")
 @Getter
 @Setter
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -53,7 +54,7 @@ public class User {
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
-    private Collection<Role> listRoles = new ArrayList<>();
+    private Set<Role> listRoles = new HashSet<>(); // Use HashSet to avoid duplicates
 
     public User() {}
 
@@ -71,15 +72,14 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.createdAt = new Date();
+        this.createdAt = new Date(); // Automatically set when creating
+        this.isActive = true; // Default is active
     }
 
     @Override
     public String toString() {
-        return "Users{" + "id="
-                + id + ", userName='"
-                + userName + '\'' + ", password='"
-                + password + '\'' + ", firstName='"
+        return "User{id=" + id + ", userName='"
+                + userName + '\'' + ", firstName='"
                 + firstName + '\'' + ", lastName='"
                 + lastName + '\'' + ", createdAt="
                 + createdAt + ", updatedAt="
@@ -95,16 +95,29 @@ public class User {
 
     public String getFullName() {
         if (this.firstName != null && this.lastName != null && !this.firstName.isEmpty() && !this.lastName.isEmpty()) {
-            return this.lastName + " " + this.firstName;
+            return this.firstName + " " + this.lastName; // Full name as "First Last"
         }
-        return null;
+        return "N/A"; // Return a default message if any name field is null or empty
     }
 
     public void setActive(Boolean active) {
         isActive = active;
     }
 
-    public void addRoles(Role roles) {
-        this.listRoles.add(roles);
+    public void addRole(Role role) {
+        if (role != null) {
+            this.listRoles.add(role); // Avoid adding null roles
+        }
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = new Date();
+        this.isActive = true; // Default to active on creation
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = new Date();
     }
 }

@@ -25,7 +25,7 @@
                            th:classappend="${#fields.hasErrors('phoneNumber')} ? 'border-red-500' : ''"
                            name="phoneNumber"
                            id="phoneNumber"
-                           placeholder="phoneNumber"
+                           placeholder="Phone number"
                            th:field="*{phoneNumber}" />
                     <div th:if="${#fields.hasErrors('phoneNumber')}" class="text-red-500 italic mt-1 text-sm">
                         <span th:errors="*{phoneNumber}"></span>
@@ -47,7 +47,7 @@
                        th:classappend="${#fields.hasErrors('address')} ? 'border-red-500' : ''"
                        name="address"
                        id="address"
-                       placeholder="address"
+                       placeholder="Address"
                        th:field="*{address}" />
                 <div th:if="${#fields.hasErrors('address')}" class="text-red-500 italic mt-1 text-sm">
                     <span th:errors="*{address}"></span>
@@ -62,11 +62,11 @@
                             <div class="flex items-col">
                                 <label class="inline-flex items-center mr-4">
                                     <input type="radio" th:field="*{gender}" class="form-radio" name="gender" value="true" th:checked="${true}" >
-                                    <span class="ml-2">Nam</span>
+                                    <span class="ml-2">Male</span>
                                 </label>
                                 <label class="inline-flex items-center">
                                     <input type="radio" th:field="*{gender}" class="form-radio" name="gender" value="false" th:checked="${false}">
-                                    <span class="ml-2">Nữ</span>
+                                    <span class="ml-2">Female</span>
                                 </label>
                             </div>
                         </div>

@@ -25,7 +25,7 @@ public class UserTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
-    public void CteateNewUser() {
+    public void CreateNewUser() {
         User users = new User("admin", "100", "Ho", "minh");
         users.setPassword(bCryptPasswordEncoder.encode("admin"));
         //        Roles role=this.rolesRepository.findById(1).get();

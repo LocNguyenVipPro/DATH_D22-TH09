@@ -3,6 +3,15 @@ package com.example.dath.eshop.dto;
 import com.example.dath.eshop.models.Order;
 import com.example.dath.eshop.models.Product;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderDTO {
     private Integer id;
 
@@ -14,23 +23,7 @@ public class OrderDTO {
 
     private Float taxTotalAmount;
 
-    private Product productId;
-    private Order orderId;
+    private Product product; // Đổi tên từ productId -> product
 
-    public OrderDTO(
-            Integer id,
-            Integer quantity,
-            Float totalAmount,
-            Float subTotalAmount,
-            Float taxTotalAmount,
-            Product productId,
-            Order orderId) {
-        this.id = id;
-        this.quantity = quantity;
-        this.totalAmount = totalAmount;
-        this.subTotalAmount = subTotalAmount;
-        this.taxTotalAmount = taxTotalAmount;
-        this.productId = productId;
-        this.orderId = orderId;
-    }
+    private Order order; // Đổi tên từ orderId -> order
 }

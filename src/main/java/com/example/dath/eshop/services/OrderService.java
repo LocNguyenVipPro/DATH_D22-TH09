@@ -18,7 +18,6 @@ import com.example.dath.eshop.repositories.*;
 
 @Service
 public class OrderService {
-
     @Autowired
     private OrderRepository orderRepository;
 
@@ -29,7 +28,7 @@ public class OrderService {
     private CartLineItemRepositoty cartLineItemRepositoty;
 
     @Autowired
-    private CartReposttory cartReposttory;
+    private CartRepository cartRepository;
 
     @Autowired
     private ProductRepository productsRepository;
@@ -37,54 +36,60 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
-    private static Integer PAGE_SIZE = 5;
+    private static final Integer PAGE_SIZE = 5;
 
-    public Order getOrderById(User users) {
-        return this.orderRepository.findByUserId(users);
+    // Get Order by User
+    public Order getOrderByUser(User user) throws OrderLineItemException {
+        return this.orderRepository
+                .findByUserId(user)
+                .orElseThrow(() -> new OrderLineItemException("Order not found for user"));
     }
 
-    // This method is used when the user wants to purchase from their shopping cart.
-    public void purchaseFromCart(Integer cartId, Integer quantity, User customer) throws CartLineItemException {
-        Optional<CartLineItem> cartOptional = findCartLineItemById(cartId);
-        CartLineItem cartLineItemPayment =
-                cartOptional.orElseThrow(() -> new CartLineItemException("Cannot Found Cart"));
+    // Purchase from Cart
+    public void purchaseFromCart(Integer cartId, Integer quantity, User customer)
+            throws CartLineItemException, ProductException {
+        CartLineItem cartLineItem =
+                findCartLineItemById(cartId).orElseThrow(() -> new CartLineItemException("Cart Line Item not found"));
+
         Order order = findOrCreateOrder(customer);
 
-        // Get product and calculator
-        Product product = getProductById(cartLineItemPayment.getProductId().getId());
-        Float taxPerProduct = cartLineItemPayment.getTaxTotalAmount() / cartLineItemPayment.getQuantity();
+        Product product = getProductById(cartLineItem.getProductId().getId());
+        Float taxPerProduct = cartLineItem.getTaxTotalAmount() / cartLineItem.getQuantity();
         Float totalAmount = calculateTotalAmount(product, quantity, taxPerProduct);
         Float taxAmount = taxPerProduct * quantity;
 
         OrderLineItem orderLineItem = createOrderLineItem(order, product, quantity, taxAmount, totalAmount);
-        updateOrderAndCart(customer, order, cartLineItemPayment, totalAmount, taxAmount, orderLineItem);
+        updateOrderAndCart(customer, order, cartLineItem, totalAmount, taxAmount, orderLineItem);
     }
 
     private Optional<CartLineItem> findCartLineItemById(Integer cartId) {
-        return this.cartLineItemRepositoty.findById(cartId);
+        return cartLineItemRepositoty.findById(cartId);
     }
 
+    // Tìm hoặc tạo đơn hàng mới cho khách hàng
     private Order findOrCreateOrder(User customer) {
-        Order order = this.orderRepository.findByUserId(customer);
-        if (order == null) {
-            order = new Order();
-            order.setUserId(customer);
-            order.setCountItem(0);
-        }
-        return order;
+        return orderRepository
+                .findByUserId(customer)
+                .orElseGet(() -> createNewOrder(customer)); // Dùng orElseGet để tạo Order nếu không tìm thấy
     }
 
-    private Product getProductById(Integer productId) {
-        return this.productsRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+    private Order createNewOrder(User customer) {
+        Order newOrder = new Order();
+        newOrder.setUserId(customer);
+        newOrder.setCountItem(0);
+        return newOrder;
+    }
+
+    private Product getProductById(Integer productId) throws ProductException {
+        return productsRepository.findById(productId).orElseThrow(() -> new ProductException("Product not found"));
     }
 
     private Float calculateTotalAmount(Product product, Integer quantity, Float taxPerProduct) {
         return (product.getDiscountPrice() * quantity) + (taxPerProduct * quantity);
     }
 
-    // create order and setup data
     private OrderLineItem createOrderLineItem(
-            Order order, Product product, int quantity, Float taxAmount, Float totalAmount) {
+            Order order, Product product, Integer quantity, Float taxAmount, Float totalAmount) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setOrderId(order);
         orderLineItem.setProductId(product);
@@ -98,109 +103,91 @@ public class OrderService {
     private void updateOrderAndCart(
             User customer,
             Order order,
-            CartLineItem cartLineItemPayment,
+            CartLineItem cartLineItem,
             Float totalAmount,
             Float taxAmount,
-            OrderLineItem orderLineItem) {
-        order.setCountItem(order.getCountItem() + cartLineItemPayment.getQuantity());
+            OrderLineItem orderLineItem)
+            throws CartLineItemException {
+        order.setCountItem(order.getCountItem() + cartLineItem.getQuantity());
         setDataForOrder(order, totalAmount, taxAmount);
-        Cart updateCart = setDataForCart(customer, cartLineItemPayment);
-        cartLineItemPayment.setCartId(null);
-        this.cartLineItemRepositoty.save(cartLineItemPayment);
-        this.cartReposttory.save(updateCart);
-        this.cartLineItemRepositoty.delete(cartLineItemPayment);
-        this.orderLineItemRepository.save(orderLineItem);
+        Cart updatedCart = setDataForCart(customer, cartLineItem);
+        cartLineItem.setCartId(null); // Remove the item from the cart
+        cartLineItemRepositoty.save(cartLineItem); // Save updated cart line item
+        cartRepository.save(updatedCart); // Save the updated cart
+        cartLineItemRepositoty.delete(cartLineItem); // Remove the cart line item
+        orderLineItemRepository.save(orderLineItem); // Save the order line item
     }
 
-    public Cart setDataForCart(User customer, CartLineItem cartLineItemPayment) {
-        Cart updateCart = this.cartReposttory.findByUserId(customer.getId());
-        updateCart.setTotalAmount(updateCart.getTotalAmount() - cartLineItemPayment.getTotalAmount());
-        updateCart.setTaxAmount(updateCart.getTaxAmount() - cartLineItemPayment.getTaxTotalAmount());
-        updateCart.setCountItem(updateCart.getCountItem() - cartLineItemPayment.getQuantity());
+    public Cart setDataForCart(User customer, CartLineItem cartLineItem) throws CartLineItemException {
+        Cart cart = cartRepository
+                .findByUserId(customer.getId())
+                .orElseThrow(() -> new CartLineItemException("Cart not found"));
 
-        if (updateCart.getCountItem() == 0) {
-            updateCart.setDeletedAt(new Date());
+        cart.setTotalAmount(cart.getTotalAmount() - cartLineItem.getTotalAmount());
+        cart.setTaxAmount(cart.getTaxAmount() - cartLineItem.getTaxTotalAmount());
+        cart.setCountItem(cart.getCountItem() - cartLineItem.getQuantity());
+
+        if (cart.getCountItem() == 0) {
+            cart.setDeletedAt(new Date()); // Mark the cart as deleted if empty
         }
 
-        return updateCart;
+        return cart;
     }
 
     public Order setDataForOrder(Order order, Float totalAmount, Float taxAmount) {
-        // update infor order
         order.setTotalAmount(order.getTotalAmount() + totalAmount);
         order.setTaxAmount(order.getTaxAmount() + taxAmount);
         order.setUpdatedAt(new Date());
-        order.setStatus(true);
-        System.out.println("cmkasmc" + order);
-        return this.orderRepository.save(order);
+        order.setStatus(true); // Mark as completed
+        return orderRepository.save(order);
     }
 
-    public OrderLineItem setDataForOderLineItem(
-            Order order, Product product, int quantity, Float taxAmount, Float totalAmount) {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setOrderId(order);
-        orderLineItem.setProductId(product);
-        orderLineItem.setQuantity(quantity);
-        orderLineItem.setTaxTotalAmount(taxAmount);
-        orderLineItem.setTotalAmount(totalAmount);
-        orderLineItem.setSubTotalAmount(product.getDiscountPrice() * quantity);
-        return orderLineItem;
-    }
-
-    // This method is used when the user wants to purchase a specific product directly without going through the
-    // shopping cart.
+    // Purchase Product directly (not from Cart)
     public void purchaseProductDirect(Integer productId, Integer quantity, User customer)
-            throws CartLineItemException, ProductException {
-        Optional<Product> selectProduct = this.productsRepository.findById(productId);
+            throws ProductException, CartLineItemException {
+        Product product = getProductById(productId);
+        Order order = findOrCreateOrder(customer);
 
-        if (selectProduct.isPresent()) {
-            Product productSelect = selectProduct.get();
-            Order order = this.orderRepository.findByUserId(customer);
+        Float taxPerProduct = (product.getDiscountPrice() * product.getTax()) / 100;
+        Float totalAmount = (product.getDiscountPrice() * quantity) + (taxPerProduct * quantity);
+        Float taxAmount = taxPerProduct * quantity;
 
-            if (order == null) {
-                order = new Order();
-                order.setUserId(customer);
-                order.setCountItem(0);
-            }
-
-            order.setCountItem(order.getCountItem() + quantity);
-            Float taxPerProduct = (productSelect.getDiscountPrice() / 100) * productSelect.getTax();
-            Float totalAmount = (productSelect.getDiscountPrice() * quantity) + (taxPerProduct * quantity);
-            Float taxAmount = taxPerProduct * quantity;
-            OrderLineItem orderLineItem =
-                    this.setDataForOderLineItem(order, productSelect, quantity, taxAmount, totalAmount);
-            order = setDataForOrder(order, totalAmount, taxAmount);
-            this.orderLineItemRepository.save(orderLineItem);
-
-        } else {
-            throw new ProductException("Cannot Found Product With Id " + productId);
-        }
+        OrderLineItem orderLineItem = createOrderLineItem(order, product, quantity, taxAmount, totalAmount);
+        updateOrderAndCart(customer, order, null, totalAmount, taxAmount, orderLineItem);
     }
 
     public void checkOutCart(User customer, List<String> productIds, List<String> quantities)
             throws ProductException, CartLineItemException {
         int index = 0;
-
-        // User Loop to delete all cart and checkout all
-        for (String s : productIds) {
+        for (String productId : productIds) {
             Integer quantity = Integer.parseInt(quantities.get(index++).replace(".0", ""));
-            this.purchaseProductDirect(Integer.parseInt(s), quantity, customer);
-            this.cartService.clearCard(customer);
+            purchaseProductDirect(Integer.parseInt(productId), quantity, customer);
         }
+        cartService.clearCard(customer); // Clear the cart after checkout
+    }
+
+    // Paginate Order Line Items
+    public Page<OrderLineItem> findOrderLineItemsByOrderId(Order order, int pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber, PAGE_SIZE);
+        return orderLineItemRepository.findByOrderId(order, pageable);
+    }
+
+    public OrderLineItem findOrderLineItemById(Integer orderLineItemId) throws OrderLineItemException {
+        return orderLineItemRepository
+                .findById(orderLineItemId)
+                .orElseThrow(
+                        () -> new OrderLineItemException("Cannot find Order Line Item with ID " + orderLineItemId));
+    }
+
+    public Order getOrderById(User user) {
+        // Trả về Order của người dùng hoặc null nếu không tìm thấy
+        return orderRepository
+                .findByUserId(user)
+                .orElseThrow(() -> new RuntimeException("Order not found for user " + user.getId()));
     }
 
     public Page<OrderLineItem> findByOrderId(Order order, int pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber, PAGE_SIZE);
-        return this.orderLineItemRepository.findByOrderId(order, pageable);
-    }
-
-    public OrderLineItem findOrderLineItemById(Integer oderLineItemId) throws OrderLineItemException {
-        Optional<OrderLineItem> OderLineItem = this.orderLineItemRepository.findById(oderLineItemId);
-
-        if (OderLineItem.isPresent()) {
-            return OderLineItem.get();
-        } else {
-            throw new OrderLineItemException("Cannot Found Oder Line Item With Id " + oderLineItemId);
-        }
+        Pageable pageable = PageRequest.of(pageNumber, 5); // Sử dụng số trang cố định là 5
+        return orderLineItemRepository.findByOrderId(order, pageable);
     }
 }

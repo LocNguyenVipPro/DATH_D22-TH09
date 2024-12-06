@@ -22,6 +22,7 @@ import com.example.dath.eshop.services.CartService;
 
 @Controller
 public class CartController {
+
     @Autowired
     private CartService cartService;
 
@@ -36,7 +37,7 @@ public class CartController {
             model.addAttribute("listRelatedProducts", listRelatedProducts);
             return "cart/cart";
         } catch (ProductException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + ex.getMessage());
             return "redirect:/main-page";
         }
     }
@@ -47,12 +48,12 @@ public class CartController {
             @RequestParam("cartLineItemId") Integer cartLineItemId,
             RedirectAttributes redirectAttributes) {
         try {
-            User user = this.cartService.findUserById(customer.getUserId());
-            this.cartService.deleteCartLineItem(cartLineItemId, user);
+            User user = cartService.findUserById(customer.getUserId());
+            cartService.deleteCartLineItem(cartLineItemId, user);
             redirectAttributes.addFlashAttribute(
-                    "message", "Delete Cart With Id : " + cartLineItemId + " Successfully");
+                    "message", "Cart item with ID " + cartLineItemId + " removed successfully.");
         } catch (CartLineItemException | UserException ex) {
-            redirectAttributes.addFlashAttribute("message", ex.getMessage());
+            redirectAttributes.addFlashAttribute("message", "Error: " + ex.getMessage());
         }
         return "redirect:/cart/shopping-cart";
     }
@@ -61,15 +62,14 @@ public class CartController {
     public String viewShoppingCart(
             @AuthenticationPrincipal ShopMeUserDetail customer, Model model, RedirectAttributes redirectAttributes) {
         try {
-            User user = this.cartService.findUserById(customer.getUserId());
-
-            model.addAttribute("pageTitle", "Cart");
-            Cart shoppingCart = this.cartService.getCartByCustomer(user);
+            User user = cartService.findUserById(customer.getUserId());
+            model.addAttribute("pageTitle", "Shopping Cart");
+            Cart shoppingCart = cartService.getCartByCustomer(user);
             model.addAttribute("shoppingCart", shoppingCart);
             model.addAttribute("listCartLineItem", cartService.getListCartItemByCart(shoppingCart));
             return "/cart/shopping-cart";
         } catch (ProductException | UserException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + ex.getMessage());
             return "redirect:/main-page";
         }
     }
@@ -81,27 +81,31 @@ public class CartController {
             @RequestParam(value = "quantity") Integer quantity,
             RedirectAttributes redirectAttributes) {
         try {
-            User customerUser = cartService.findUserById(customer.getUserId());
             if (productId == null || quantity == null || quantity <= 0) {
-                throw new IllegalArgumentException("Invalid productId or quantity.");
+                throw new IllegalArgumentException("Invalid product ID or quantity.");
             }
+            User customerUser = cartService.findUserById(customer.getUserId());
             Product selectedProduct = cartService.getProductById(productId);
             cartService.addProductToCart(customerUser, selectedProduct, quantity);
-            redirectAttributes.addFlashAttribute("message", "Shopping cart is updated Successfully");
+            redirectAttributes.addFlashAttribute("message", "Shopping cart updated successfully.");
             return "redirect:/cart?productId=" + productId;
         } catch (ProductException | IllegalArgumentException | UserException ex) {
-            redirectAttributes.addFlashAttribute("errMessage", ex.getMessage());
-            return "redirect:/cart/productId=" + productId;
+            redirectAttributes.addFlashAttribute("errMessage", "Error: " + ex.getMessage());
+            return "redirect:/cart?productId=" + productId;
         }
     }
 
     @GetMapping("/cart/clear")
-    public String clearAllCardAndCartLineItem(
-            @AuthenticationPrincipal ShopMeUserDetail customer, RedirectAttributes redirectAttributes)
-            throws ProductException, UserException {
-        User customerUser = this.cartService.findUserById(customer.getUserId());
-        this.cartService.clearCard(customerUser);
-        redirectAttributes.addFlashAttribute("message", "Clear Cart Successfully");
-        return "redirect:/cart/shopping-cart";
+    public String clearAllCartAndCartLineItems(
+            @AuthenticationPrincipal ShopMeUserDetail customer, RedirectAttributes redirectAttributes) {
+        try {
+            User customerUser = cartService.findUserById(customer.getUserId());
+            cartService.clearCard(customerUser);
+            redirectAttributes.addFlashAttribute("message", "Cart cleared successfully.");
+            return "redirect:/cart/shopping-cart";
+        } catch (ProductException | UserException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + ex.getMessage());
+            return "redirect:/cart/shopping-cart";
+        }
     }
 }

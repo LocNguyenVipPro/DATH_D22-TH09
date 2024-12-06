@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@SlugAndNameUnique(idField = "id", SlugField = "slug", nameField = "name")
+@SlugAndNameUnique(idField = "id", slugField = "slug", nameField = "name")
 public class CategoryRequest {
     private Integer id;
 

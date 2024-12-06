@@ -11,22 +11,26 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class UserSecurityConfiguration {
+
+    // Bean cho BCryptPasswordEncoder
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(DetailService deltailSerVice) {
+    public DaoAuthenticationProvider daoAuthenticationProvider(DetailService detailService) {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(deltailSerVice);
+        daoAuthenticationProvider.setUserDetailsService(detailService);
         daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
         return daoAuthenticationProvider;
     }
 
+    // Cấu hình bảo mật HTTP
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
-        security.authorizeHttpRequests(configurer -> configurer
+        security
+                .authorizeHttpRequests(configurer -> configurer
                         .requestMatchers(
                                 "/products/load-product",
                                 "/login",
@@ -34,40 +38,51 @@ public class UserSecurityConfiguration {
                                 "/users/save",
                                 "/users/check-username-unique",
                                 "/users/register",
-                                "/auth/**")
-                        .permitAll()
-                        .requestMatchers("/cart")
-                        .permitAll()
-                        .requestMatchers("cart/**")
-                        .authenticated()
-                        .requestMatchers("/users/**")
-                        .hasAnyAuthority("Admin", "User")
-                        .requestMatchers("/orders/**")
-                        .hasAnyAuthority("Admin", "User")
-                        .requestMatchers("/category/**")
-                        .hasAnyAuthority("Admin")
-                        .requestMatchers("/products/**")
-                        .hasAnyAuthority("Admin")
-                        .requestMatchers(
-                                "/resources/**", "/static/**", "/css/**", "/javascripts/**", "/images/**", "/public/**")
-                        .permitAll()
+                                "/auth/**",
+                                "/resources/**", "/static/**", "/css/**", "/js/**", "/images/**", "/public/**")
+                        .permitAll()  // Cho phép tất cả các yêu cầu không cần xác thực
+
+                        .requestMatchers("/cart", "/cart/**")
+                        .authenticated()  // Các yêu cầu liên quan đến giỏ hàng phải đăng nhập
+
+                        .requestMatchers("/users/**", "/orders/**")
+                        .hasAnyAuthority("Admin", "User")  // Cả Admin và User có quyền truy cập
+
+                        .requestMatchers("/category/**", "/products/**")
+                        .hasAuthority("Admin")  // Chỉ Admin mới có quyền truy cập các URL này
+
                         .anyRequest()
-                        .authenticated())
-                .formLogin(form -> form.loginPage("/login-form")
+                        .authenticated()  // Các yêu cầu còn lại đều phải xác thực
+                )
+
+                // Cấu hình form login
+                .formLogin(form -> form
+                        .loginPage("/login-form")
                         .loginProcessingUrl("/authenticateTheUser")
                         .defaultSuccessUrl("/main-page", true)
-                        .permitAll()
-                        .usernameParameter("username")
-                        .passwordParameter("password"))
-                .logout(logout -> logout.logoutUrl("/logout")
+                        .permitAll()  // Cho phép mọi người truy cập trang login
+                )
+
+                // Cấu hình logout
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/login-form")
-                        .invalidateHttpSession(true) // Invalidates the HttpSession
-                        .deleteCookies("JSESSIONID"))
-                .rememberMe(rememberme -> rememberme
+                        .invalidateHttpSession(true)  // Xóa session khi logout
+                        .deleteCookies("JSESSIONID")  // Xóa cookie JSESSIONID
+                )
+
+                // Cấu hình RememberMe
+                .rememberMe(rememberMe -> rememberMe
                         .rememberMeParameter("rememberMe")
-                        .tokenValiditySeconds(604800)
-                        .key("loggedIn"))
-                .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedPage("/access-denied"));
+                        .tokenValiditySeconds(604800)  // Giữ đăng nhập trong 7 ngày
+                        .key("loggedIn")
+                )
+
+                // Cấu hình xử lý lỗi truy cập không hợp lệ
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedPage("/access-denied")
+                );
+
         return security.build();
     }
 }

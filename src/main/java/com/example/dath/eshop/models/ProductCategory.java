@@ -54,7 +54,7 @@ public class ProductCategory {
     @Column(name = "image", length = 255)
     private String image;
 
-    @ManyToMany(mappedBy = "ListProductCategories", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "listProductCategories", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Product> listProducts = new HashSet<>();
 
     public ProductCategory(String name, String slug, String description) {

@@ -10,17 +10,18 @@ import com.example.dath.eshop.exceptions.ProductException;
 import com.example.dath.eshop.exceptions.UserException;
 import com.example.dath.eshop.models.*;
 import com.example.dath.eshop.repositories.CartLineItemRepositoty;
-import com.example.dath.eshop.repositories.CartReposttory;
+import com.example.dath.eshop.repositories.CartRepository;
 import com.example.dath.eshop.repositories.ProductRepository;
 import com.example.dath.eshop.repositories.UserRepository;
 
 @Service
 public class CartService {
-    @Autowired
-    private CartReposttory cartReposttory;
 
     @Autowired
-    private ProductRepository productsRepository;
+    private CartRepository cartRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private CartLineItemRepositoty cartLineItemRepositoty;
@@ -28,72 +29,86 @@ public class CartService {
     @Autowired
     private UserRepository userRepository;
 
+    // Get product by ID with exception handling
     public Product getProductById(Integer id) throws ProductException {
-        Optional<Product> productOptional = productsRepository.findById(id);
-        return productOptional.orElseThrow(() -> new ProductException("Cannot find product with ID: " + id));
+        return productRepository
+                .findById(id)
+                .orElseThrow(() -> new ProductException("Cannot find product with ID: " + id));
     }
 
+    // Find user by ID with exception handling
     public User findUserById(Integer id) throws UserException {
-        Optional<User> userOptional = userRepository.findById(id);
-        return userOptional.orElseThrow(() -> new UserException("Cannot find user with ID: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new UserException("Cannot find user with ID: " + id));
     }
 
-    public List<CartLineItem> getListCartItemByCart(Cart cart) throws ProductException {
-        return this.cartLineItemRepositoty.findByCartId(cart);
+    // Get all cart items by cart
+    public List<CartLineItem> getListCartItemByCart(Cart cart) {
+        return cartLineItemRepositoty.findByCartId(cart);
     }
 
+    // Get cart by customer (user)
     public Cart getCartByCustomer(User customer) throws ProductException {
-        return this.cartReposttory.findByUserId(customer.getId());
+        return cartRepository
+                .findByUserId(customer.getId())
+                .orElseThrow(() -> new ProductException("Cannot find cart for user with ID: " + customer.getId()));
     }
 
-    public void addProductToCart(User customer, Product selectProduct, Integer quantity) throws ProductException {
-        Cart cart = getOrCreateCart(customer);
-        updateCartInfo(cart, selectProduct, quantity);
-    }
+    // Add product to cart, check stock quantity first
+    public void addProductToCart(User customer, Product selectedProduct, Integer quantity) {
+        try {
+            if (selectedProduct == null || selectedProduct.getStockQuantity() <= 0) {
+                throw new ProductException("Product is out of stock");
+            }
 
-    private Cart getOrCreateCart(User customer) {
-        Cart cart = this.cartReposttory.findByUserId(customer.getId());
-
-        if (cart == null) {
-            cart = new Cart();
-            cart.setUser(customer);
-            cart = this.cartReposttory.save(cart);
-        } else {
-            cart.setUpdatedAt(new Date());
+            Cart cart = getOrCreateCart(customer);
+            updateCartInfo(cart, selectedProduct, quantity);
+        } catch (ProductException e) {
+            // Xử lý lỗi, ví dụ: log lỗi, thông báo cho người dùng, v.v.
+            System.out.println("Error: " + e.getMessage());
         }
+    }
 
+    // Get or create cart for a customer
+    private Cart getOrCreateCart(User customer) {
+        Cart cart = cartRepository.findByUserId(customer.getId()).orElseGet(() -> {
+            Cart newCart = new Cart();
+            newCart.setUser(customer);
+            return cartRepository.save(newCart);
+        });
+        cart.setUpdatedAt(new Date()); // Manually setting updatedAt if necessary
         return cart;
     }
 
-    private void updateCartInfo(Cart cart, Product selectProduct, Integer quantity) {
-        CartLineItem cartLineItem = getOrCreateCartLineItem(cart, selectProduct);
-        updateCartAndCartItem(cart, cartLineItem, selectProduct, quantity);
+    // Update cart info when adding a product
+    private void updateCartInfo(Cart cart, Product selectedProduct, Integer quantity) {
+        CartLineItem cartLineItem = getOrCreateCartLineItem(cart, selectedProduct);
+        updateCartAndCartItem(cart, cartLineItem, selectedProduct, quantity);
     }
 
-    private CartLineItem getOrCreateCartLineItem(Cart cart, Product selectProduct) {
-        CartLineItem cartLineItem = this.cartLineItemRepositoty.findByCartIdAndProductId(cart, selectProduct);
-
+    // Get or create cart line item
+    private CartLineItem getOrCreateCartLineItem(Cart cart, Product selectedProduct) {
+        CartLineItem cartLineItem = cartLineItemRepositoty.findByCartIdAndProductId(cart, selectedProduct);
         if (cartLineItem == null) {
             cartLineItem = new CartLineItem();
             cartLineItem.setCreatedAt(new Date());
         } else {
             cartLineItem.setUpdatedAt(new Date());
         }
-
         return cartLineItem;
     }
 
+    // Update cart and cart line item
     private void updateCartAndCartItem(Cart cart, CartLineItem cartLineItem, Product buyProduct, Integer quantity) {
-        // calculator data
+        // Calculate tax amount and price before tax
         Float taxAmount = calculateTaxAmount(buyProduct, quantity);
         Float priceBeforeTax = buyProduct.getDiscountPrice() * quantity;
 
-        // update data for cart
+        // Update cart totals
         cart.setCountItem(cart.getCountItem() + quantity);
         cart.setTaxAmount(cart.getTaxAmount() + taxAmount);
-        cart.setTotalAmount(cart.getTotalAmount() + taxAmount + priceBeforeTax);
+        cart.setTotalAmount(cart.getTotalAmount() + priceBeforeTax + taxAmount);
 
-        // update data for cartLineItem
+        // Update cart line item totals
         cartLineItem.setQuantity(cartLineItem.getQuantity() + quantity);
         cartLineItem.setSubTotalAmount(cartLineItem.getSubTotalAmount() + priceBeforeTax);
         cartLineItem.setTaxTotalAmount(cartLineItem.getTaxTotalAmount() + taxAmount);
@@ -101,63 +116,69 @@ public class CartService {
         cartLineItem.setProductId(buyProduct);
         cartLineItem.setCartId(cart);
 
-        this.cartLineItemRepositoty.save(cartLineItem);
-        this.cartReposttory.save(cart);
+        // Save updated cart line item and cart
+        cartLineItemRepositoty.save(cartLineItem);
+        cartRepository.save(cart);
     }
 
-    private Float calculateTaxAmount(Product selectProduct, Integer quantity) {
-        return ((selectProduct.getDiscountPrice() * quantity) / 100) * selectProduct.getTax();
+    // Calculate tax amount
+    private Float calculateTaxAmount(Product selectedProduct, Integer quantity) {
+        return (selectedProduct.getDiscountPrice() * quantity * selectedProduct.getTax()) / 100;
     }
 
-    public void deleteCartLineItem(Integer cardLineItemId, User customer) throws CartLineItemException {
-        Optional<CartLineItem> cartLineItemsOptional = this.cartLineItemRepositoty.findById(cardLineItemId);
-        CartLineItem cartLineItems = cartLineItemsOptional.orElseThrow(
-                () -> new CartLineItemException("Cannot find Cart Line Item with ID: " + cardLineItemId));
+    // Delete cart line item
+    public void deleteCartLineItem(Integer cartLineItemId, User customer) throws CartLineItemException {
+        CartLineItem cartLineItem = cartLineItemRepositoty
+                .findById(cartLineItemId)
+                .orElseThrow(() -> new CartLineItemException("Cannot find Cart Line Item with ID: " + cartLineItemId));
 
-        // Unlink Cart from CartLineItem
-        cartLineItems.setCartId(null);
-        this.cartLineItemRepositoty.save(cartLineItems);
+        // Unlink cart line item from cart
+        cartLineItem.setCartId(null);
+        cartLineItemRepositoty.save(cartLineItem);
 
-        // Update Cart
-        Cart cart = this.cartReposttory.findByUserId(customer.getId());
-        cart.setCountItem(cart.getCountItem() - cartLineItems.getQuantity());
-        cart.setTaxAmount(cart.getTaxAmount() - cartLineItems.getTaxTotalAmount());
-        cart.setTotalAmount(cart.getTotalAmount() - cartLineItems.getTotalAmount());
+        // Update cart totals
+        Cart cart = cartRepository
+                .findByUserId(customer.getId())
+                .orElseThrow(() -> new CartLineItemException("Cart not found for user"));
+        cart.setCountItem(cart.getCountItem() - cartLineItem.getQuantity());
+        cart.setTaxAmount(cart.getTaxAmount() - cartLineItem.getTaxTotalAmount());
+        cart.setTotalAmount(cart.getTotalAmount() - cartLineItem.getTotalAmount());
 
-        // Check if the cart is empty after removing the cart line item
-        List<CartLineItem> cartLineItemContailCartId = this.cartLineItemRepositoty.findByCartId(cart);
-        if (cartLineItemContailCartId.isEmpty()) {
+        // Mark cart as deleted if no items left
+        if (cartLineItemRepositoty.findByCartId(cart).isEmpty()) {
             cart.setDeletedAt(new Date());
+            cart.setIsActive(false); // Mark cart as inactive
         }
 
-        this.cartReposttory.save(cart);
-        this.cartLineItemRepositoty.delete(cartLineItems);
+        cartRepository.save(cart);
+        cartLineItemRepositoty.delete(cartLineItem);
     }
 
-    public void clearCard(User Customer) {
-        Cart cartClear = this.cartReposttory.findByUserId(Customer.getId());
+    // Clear cart for a user
+    public void clearCard(User customer) throws ProductException {
+        Cart cart = cartRepository
+                .findByUserId(customer.getId())
+                .orElseThrow(() -> new ProductException("Cart not found for user"));
 
-        if (cartClear != null) {
-            List<CartLineItem> cartLineItemList = this.cartLineItemRepositoty.findByCartId(cartClear);
-            List<CartLineItem> deleteCartLineItem = new ArrayList<>();
-            for (CartLineItem cartLineItem : cartLineItemList) {
-                cartLineItem.setCartId(null);
-                deleteCartLineItem.add(cartLineItem);
-            }
-            this.cartLineItemRepositoty.saveAll(deleteCartLineItem);
-            this.cartLineItemRepositoty.deleteAll(deleteCartLineItem);
-            cartClear.setUser(null);
-            this.cartReposttory.save(cartClear);
-            this.cartReposttory.delete(cartClear);
+        // Remove all line items
+        List<CartLineItem> cartLineItems = cartLineItemRepositoty.findByCartId(cart);
+        for (CartLineItem lineItem : cartLineItems) {
+            lineItem.setCartId(null);
         }
+        cartLineItemRepositoty.deleteAll(cartLineItems);
+
+        // Mark the cart as deleted
+        cart.setDeletedAt(new Date());
+        cart.setIsActive(false); // Mark cart as inactive
+        cartRepository.save(cart);
     }
 
+    // Get related products for a given cart product
     public Set<Product> getRelatedProduct(Product cartProduct) {
-        Set<Product> relatedProduct = new HashSet<>();
-        for (ProductCategory productCategory : cartProduct.getListProductCategories()) {
-            relatedProduct.addAll(this.productsRepository.getProductsRelated(productCategory));
-        }
-        relatedProduct.remove(cartProduct);
-        return relatedProduct;
+        Set<ProductCategory> productCategories = cartProduct.getListProductCategories();
+        Set<Product> relatedProducts =
+                new HashSet<>(productRepository.getProductsRelated((ProductCategory) productCategories));
+        relatedProducts.remove(cartProduct);
+        return relatedProducts;
     }
 }

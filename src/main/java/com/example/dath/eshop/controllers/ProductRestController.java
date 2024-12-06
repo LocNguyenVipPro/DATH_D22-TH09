@@ -1,8 +1,5 @@
 package com.example.dath.eshop.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,8 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.dath.eshop.dto.ProductDTO;
 import com.example.dath.eshop.services.ProductService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 public class ProductRestController {
+
     @Autowired
     private ProductService productService;
 
@@ -22,27 +23,28 @@ public class ProductRestController {
             @RequestParam(value = "rangeSalePercent", required = false) String rangeSalePercent,
             @RequestParam(value = "categoryId", required = false) String categoryId) {
 
-        if (rangePrice == null || rangePrice.trim().isEmpty()) {
-            rangePrice = null;
-        }
+        // Xử lý các tham số đầu vào null hoặc trống
+        rangePrice = sanitizeParam(rangePrice);
+        rangeSalePercent = sanitizeParam(rangeSalePercent);
+        categoryId = sanitizeParam(categoryId);
 
-        if (rangeSalePercent == null || rangeSalePercent.trim().isEmpty()) {
-            rangeSalePercent = null;
-        }
-
-        if (categoryId == null || categoryId.trim().isEmpty()) {
-            categoryId = null;
-        }
-
+        // Lấy danh sách sản phẩm từ service
         List<ProductDTO> listProduct = productService.findByPrice(rangePrice, rangeSalePercent, categoryId);
-        List<ProductDTO> productContain = new ArrayList<>();
 
-        for (ProductDTO product : listProduct) {
-            if (product.getQuantityProduct() == null) product.setQuantityProduct(0L);
-            product.getProduct().setListProductCategories(null);
-            productContain.add(product);
-        }
+        // Xử lý lại danh sách sản phẩm
+        return listProduct.stream()
+                .map(product -> {
+                    if (product.getQuantityProduct() == null) {
+                        product.setQuantityProduct(0L);  // Đảm bảo quantity không null
+                    }
+                    product.getProduct().setListProductCategories(null);  // Loại bỏ danh sách category
+                    return product;
+                })
+                .collect(Collectors.toList());  // Trả về danh sách đã xử lý
+    }
 
-        return productContain;
+    // Phương thức giúp xử lý tham số null hoặc trống
+    private String sanitizeParam(String param) {
+        return (param == null || param.trim().isEmpty()) ? null : param;
     }
 }

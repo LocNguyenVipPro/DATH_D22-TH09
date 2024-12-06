@@ -19,6 +19,7 @@ import com.example.dath.eshop.services.UserService;
 
 @Controller
 public class AuthController {
+
     @Autowired
     private UserService userService;
 
@@ -46,7 +47,8 @@ public class AuthController {
             model.addAttribute("email", email);
             return "authenticated/verification-code-form";
         } catch (UserException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", "Error sending verification email: " + ex.getMessage());
             return "redirect:/auth/forgot-password";
         }
     }
@@ -54,23 +56,30 @@ public class AuthController {
     @PostMapping("/auth/validator-token")
     public String checkValidToken(@RequestParam("token") String token, @RequestParam("email") String email, Model model)
             throws TokenException {
-        User verifiedUser = this.userService.findUserByUserName(email);
-        Token verificationToken = this.tokenService.getTokenByUser(verifiedUser);
+        try {
+            User verifiedUser = this.userService.findUserByUserName(email);
+            Token verificationToken = this.tokenService.getTokenByUser(verifiedUser);
 
-        // Check token is valid
-        if (!(this.tokenService.isValidToken(verificationToken)
-                && verificationToken.getToken().equals(token)
-                && verificationToken.getUser().equals(verifiedUser))) {
-            model.addAttribute("pageTitle", "Verification Code");
+            // Check token is valid
+            if (!this.tokenService.isValidToken(verificationToken)
+                    || !verificationToken.getToken().equals(token)
+                    || !verificationToken.getUser().equals(verifiedUser)) {
+                model.addAttribute("pageTitle", "Verification Code");
+                model.addAttribute("email", email);
+                model.addAttribute("errMessage", "Your verification code is invalid or has expired.");
+                return "authenticated/verification-code-form";
+            }
+
+            model.addAttribute("pageTitle", "Change Password");
             model.addAttribute("email", email);
-            model.addAttribute("errMessage", "Your code is invalid");
+            model.addAttribute("token", token);
+            return "authenticated/update-password";
+
+        } catch (Exception ex) {
+            model.addAttribute("pageTitle", "Verification Code");
+            model.addAttribute("errMessage", "Error validating token: " + ex.getMessage());
             return "authenticated/verification-code-form";
         }
-
-        model.addAttribute("pageTitle", "Change Password");
-        model.addAttribute("email", email);
-        model.addAttribute("token", token);
-        return "authenticated/update-password";
     }
 
     @PostMapping("/auth/save-update-password")
@@ -78,14 +87,22 @@ public class AuthController {
             @RequestParam("email") String email,
             @RequestParam("password") String newPassword,
             RedirectAttributes redirectAttributes) {
-        User savedUser = this.userService.findUserByUserName(email);
-        if (savedUser != null) {
-            savedUser.setPassword(passwordEncoder.encode(newPassword));
-            this.tokenService.deleteToken(savedUser);
-            this.userService.save(savedUser);
-            redirectAttributes.addFlashAttribute("Message", "Change Password Successfully");
-            return "redirect:/login-form";
+        try {
+            User savedUser = this.userService.findUserByUserName(email);
+            if (savedUser != null) {
+                // Validate new password here if needed (e.g., check strength)
+                savedUser.setPassword(passwordEncoder.encode(newPassword));
+                this.tokenService.deleteToken(savedUser);
+                this.userService.save(savedUser);
+                redirectAttributes.addFlashAttribute("Message", "Password updated successfully!");
+                return "redirect:/login-form";
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
+                return "redirect:/auth/forgot";
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating password: " + e.getMessage());
+            return "redirect:/auth/forgot";
         }
-        return "redirect:/auth/forgot";
     }
 }

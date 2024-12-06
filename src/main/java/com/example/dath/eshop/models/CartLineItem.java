@@ -41,38 +41,50 @@ public class CartLineItem {
     @LastModifiedDate
     private Date updatedAt;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // Changed to PERSIST and MERGE
     @JoinColumn(name = "cart_id")
     private Cart cartId;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE) // Left as MERGE, considering you might not want to persist the product
     @JoinColumn(name = "product_id")
     private Product productId;
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return "CartLineItems{" + "id="
-                + id + ", quantity="
-                + quantity + ", totalAmount="
-                + totalAmount + ", subTotalAmount="
-                + subTotalAmount + ", taxTotalAmount="
-                + taxTotalAmount + ", createdAt="
-                + createdAt + ", updatedAt="
-                + updatedAt + ", cartId="
-                + cartId + ", productId="
-                + productId + '}';
-    }
-
     public CartLineItem() {
-
         this.quantity = 0;
         this.totalAmount = 0;
         this.subTotalAmount = 0;
         this.taxTotalAmount = 0;
         this.createdAt = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = new Date(); // Automatically set updatedAt when entity is updated
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("CartLineItem{")
+                .append("id=")
+                .append(id)
+                .append(", quantity=")
+                .append(quantity)
+                .append(", totalAmount=")
+                .append(totalAmount)
+                .append(", subTotalAmount=")
+                .append(subTotalAmount)
+                .append(", taxTotalAmount=")
+                .append(taxTotalAmount)
+                .append(", createdAt=")
+                .append(createdAt)
+                .append(", updatedAt=")
+                .append(updatedAt)
+                .append(", cartId=")
+                .append(cartId)
+                .append(", productId=")
+                .append(productId)
+                .append('}');
+        return sb.toString();
     }
 }

@@ -22,7 +22,7 @@ public class Cart {
 
     private float taxAmount;
 
-    private Float totalAmount;
+    private float totalAmount; // Changed to 'float' for consistency
 
     private float countItem;
 
@@ -40,9 +40,9 @@ public class Cart {
     private Date createdAt;
 
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean isActive = true; // Set default value for isActive
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // Updated cascade type
     @JoinColumn(name = "users_id")
     private User user;
 
@@ -51,19 +51,42 @@ public class Cart {
         this.createdAt = new Date();
         this.taxAmount = 0;
         this.totalAmount = 0f;
+        this.isActive = true; // Default value for isActive
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = new Date(); // Automatically set updatedAt when entity is updated
     }
 
     @Override
     public String toString() {
-        return "Cart{" + "id="
-                + id + ", tax_amount="
-                + taxAmount + ", total_amount="
-                + totalAmount + ", count_items="
-                + countItem + ", updatedAt="
-                + updatedAt + ", deletedAt="
-                + deletedAt + ", createdAt="
-                + createdAt + ", isActive="
-                + isActive + ", usersId="
-                + user + '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("Cart{")
+                .append("id=")
+                .append(id)
+                .append(", taxAmount=")
+                .append(taxAmount)
+                .append(", totalAmount=")
+                .append(totalAmount)
+                .append(", countItem=")
+                .append(countItem)
+                .append(", updatedAt=")
+                .append(updatedAt)
+                .append(", deletedAt=")
+                .append(deletedAt)
+                .append(", createdAt=")
+                .append(createdAt)
+                .append(", isActive=")
+                .append(isActive)
+                .append(", user=")
+                .append(user)
+                .append('}');
+        return sb.toString();
+    }
+
+    // Optional: Calculate total amount with tax
+    public float getTotalAmountWithTax() {
+        return this.totalAmount + this.taxAmount;
     }
 }

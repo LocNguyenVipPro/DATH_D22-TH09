@@ -2,31 +2,16 @@ package com.example.dath.eshop.dto;
 
 import com.example.dath.eshop.models.Product;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDTO {
     private Product product;
     private Long quantityProduct;
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public Long getQuantityProduct() {
-        return quantityProduct;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public void setQuantityProduct(Long quantityProduct) {
-        this.quantityProduct = quantityProduct;
-    }
-
-    public ProductDTO(Product product, Long quantiryPurchase) {
-        this.product = product;
-        this.quantityProduct = quantiryPurchase;
-    }
 }

@@ -55,7 +55,7 @@ public class UserService {
 
     public User save(User users) {
         Role defaultRole = rolesRepository.findById(1).orElseGet(() -> createDefaultRole(1));
-        users.addRoles(defaultRole);
+        users.addRole(defaultRole);
 
         if (users.getId() != null) {
             users.setUpdatedAt(new Date());

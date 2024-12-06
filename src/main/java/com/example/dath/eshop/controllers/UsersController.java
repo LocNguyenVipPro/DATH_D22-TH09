@@ -26,25 +26,32 @@ public class UsersController {
     @Autowired
     private UserService userService;
 
+    private void prepareModelForUserForm(Model model, String pageTitle, String titleForm, boolean isNewUser) {
+        model.addAttribute("pageTitle", pageTitle);
+        model.addAttribute("titleForm", titleForm);
+        model.addAttribute("isNewUser", isNewUser);
+    }
+
     @GetMapping("/users/register")
     public String viewRegisterForm(Model model) {
-        model.addAttribute("pageTitle", "Sign Up");
-        model.addAttribute("titleForm", "Sign Up");
-        model.addAttribute("isNewUser", true);
+        prepareModelForUserForm(model, "Sign Up", "Sign Up", true);
         model.addAttribute("userRequest", new UserRequest());
         return "user/register-form";
     }
 
     @GetMapping("/users/update_information")
     public String viewUpdateInformation(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-
-        User userLoggin = null;
-        if (userDetails != null) {
-            userLoggin = userService.findUserByUserName(userDetails.getUsername());
+        if (userDetails == null) {
+            return "redirect:/login";
         }
 
-        UserProfile userProfile = this.userService.getUserProfileByUsersId(userLoggin.getId());
-        this.userService.setUpToUpdateForm(model, userProfile);
+        User userLoggin = userService.findUserByUserName(userDetails.getUsername());
+        if (userLoggin == null) {
+            return "redirect:/login";
+        }
+
+        UserProfile userProfile = userService.getUserProfileByUsersId(userLoggin.getId());
+        userService.setUpToUpdateForm(model, userProfile);
         return "user/update-information-user";
     }
 
@@ -60,31 +67,28 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("pageTitle", "Update User");
             model.addAttribute("titleForm", "Update User Profile");
-            if (checked.equals("false")) {
+            if ("false".equals(checked)) {
                 model.addAttribute("isCheckGenderChoose", false);
             }
             return "user/update-information-user";
         }
 
-        this.userService.updateProfile(UserProfileMapper.toUserProfile(userProfileRequest), userDetails);
-        redirectAttributes.addFlashAttribute("Message", "update Profile Successfully");
+        userService.updateProfile(UserProfileMapper.toUserProfile(userProfileRequest), userDetails);
+        redirectAttributes.addFlashAttribute("Message", "Update Profile Successfully");
         return "redirect:/main-page";
     }
 
     @GetMapping("/users/edit")
     public String viewEditForm(@AuthenticationPrincipal ShopMeUserDetail userDetails, Model model) {
-        if (userDetails != null) {
-            User user = userService.findUserByUserName(userDetails.getUsername());
-            UserRequest userRequest = UserMapper.toUserRequest(user);
-
-            this.userService.prepareFormModel(model, "Edit User", false);
-            model.addAttribute("pageTitle", "Edit User Id | " + userDetails.getUserId());
-            model.addAttribute("titleForm", "Edit User");
-            model.addAttribute("userRequest", userRequest);
-            return "user/register-form";
-        } else {
+        if (userDetails == null) {
             return "redirect:/login";
         }
+
+        User user = userService.findUserByUserName(userDetails.getUsername());
+        UserRequest userRequest = UserMapper.toUserRequest(user);
+        prepareModelForUserForm(model, "Edit User Id | " + userDetails.getUserId(), "Edit User", false);
+        model.addAttribute("userRequest", userRequest);
+        return "user/register-form";
     }
 
     @PostMapping("/users/save")
@@ -96,25 +100,24 @@ public class UsersController {
             throws UserException {
         if (bindingResult.hasErrors()) {
             if (createUserRequest.getId() != null) {
-                this.userService.prepareFormModel(model, "Edit User", false);
+                prepareModelForUserForm(model, "Edit User", "Edit User", false);
             } else {
-                this.userService.prepareFormModel(model, "Sign Up", true);
+                prepareModelForUserForm(model, "Sign Up", "Sign Up", true);
             }
             return "user/register-form";
         }
 
-        User userToSave = null;
-        User users = UserMapper.toUser(createUserRequest);
-
+        User userToSave = UserMapper.toUser(createUserRequest);
         if (createUserRequest.getId() != null && createUserRequest.getId() != 0) {
-            userToSave = this.userService.updateUser(users);
+            userToSave = userService.updateUser(userToSave);
             redirectAttributes.addFlashAttribute("Message", "Update Information Successfully");
         } else {
-            userToSave = this.userService.createNewUser(users);
+            userToSave = userService.createNewUser(userToSave);
             redirectAttributes.addFlashAttribute("Message", "Register Account Successfully");
         }
 
-        this.userService.save(userToSave);
+        userService.save(userToSave);
         return "redirect:/login-form";
     }
 }
+

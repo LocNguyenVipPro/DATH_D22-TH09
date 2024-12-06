@@ -64,7 +64,7 @@ public class OrderController {
             User customerUser = this.userService.findUserById(customer.getUserId());
             this.orderService.purchaseFromCart(cartLineItemId, quantity, customerUser);
 
-        } catch (CartLineItemException | UserException e) {
+        } catch (CartLineItemException | UserException | ProductException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/cart/shopping-cart";
         }

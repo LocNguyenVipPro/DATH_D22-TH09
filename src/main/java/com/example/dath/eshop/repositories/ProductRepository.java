@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("select p from Product p where p.id =:id and p.isActive=true")
     public Optional<Product> findById(Integer id);
 
-    @Query("SELECT p FROM Product p JOIN p.ListProductCategories pc WHERE pc = :category")
+    @Query("SELECT p FROM Product p JOIN p.listProductCategories pc WHERE pc = :category")
     public List<Product> getProductsRelated(ProductCategory category);
 
     @Query("select p from Product  p where p.isActive=false and p.id=:id")
@@ -27,14 +27,14 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     public Product findProductBySku(String sku);
 
     @Query("SELECT p, SUM(oli.quantity) AS totalOrdered " + "FROM Product p "
-            + "left JOIN p.ListProductCategories pc "
+            + "left JOIN p.listProductCategories pc "
             + "left JOIN OrderLineItem oli ON p.id = oli.productId.id "
             + "WHERE pc.id = :categoryId AND p.isActive = :isHide "
             + "GROUP BY p.id, p ")
     List<Object[]> findAllByCategoryId(@Param("categoryId") Integer categoryId, @Param("isHide") Boolean isHide);
 
     @Query("SELECT p" + " FROM Product p "
-            + " left JOIN p.ListProductCategories pc "
+            + " left JOIN p.listProductCategories pc "
             + " left JOIN OrderLineItem oli ON p.id = oli.productId.id "
             + " WHERE pc.id = :categoryId AND p.isActive = :isHide ")
     List<Product> findAll(@Param("categoryId") Integer categoryId, @Param("isHide") Boolean isHide);
@@ -46,7 +46,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Object[]> findAll(@Param("keyword") String keyword, @Param("isHide") Boolean isHide);
 
     @Query("SELECT p, COALESCE(SUM(oli.quantity), 0) AS totalOrdered    " + "FROM Product p "
-            + "left JOIN p.ListProductCategories pc "
+            + "left JOIN p.listProductCategories pc "
             + "left JOIN OrderLineItem oli ON p.id = oli.productId.id "
             + "WHERE (:categoryId IS NULL OR pc.id = :categoryId) "
             + "  AND CONCAT(p.name, p.sku, pc.name) LIKE %:keyword% "
@@ -63,7 +63,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     @Query("SELECT p, COALESCE(SUM(oli.quantity), 0) AS total_sold " + "FROM Product p "
             + "LEFT JOIN OrderLineItem oli ON p.id = oli.productId.id "
-            + "WHERE (EXISTS (SELECT 1 FROM p.ListProductCategories pc WHERE pc.id = :categoryId) OR :categoryId IS NULL) "
+            + "LEFT JOIN p.listProductCategories pc "
+            + "WHERE (:categoryId IS NULL OR pc.id = :categoryId) "
             + "AND p.isActive = true "
             + "AND ((:minPrice IS NULL OR :maxPrice IS NULL) OR (p.discountPrice >= :minPrice AND p.discountPrice <= :maxPrice)) "
             + "AND ((:minRangePercent IS NULL OR :maxRangePercent IS NULL) OR ((p.price - p.discountPrice) / p.price * 100 >= :minRangePercent AND (p.price - p.discountPrice) / p.price * 100 <= :maxRangePercent)) "

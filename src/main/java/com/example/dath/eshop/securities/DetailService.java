@@ -11,8 +11,12 @@ import com.example.dath.eshop.services.UserService;
 
 @Service
 public class DetailService implements UserDetailsService {
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public DetailService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -26,7 +26,7 @@ public class productCategoryTest {
     }
 
     @Test
-    public void findall() {
+    public void findAll() {
         List<ProductCategory> productCategories = this.productCategoryRepository.findAll();
         for (ProductCategory product : productCategories) {
             System.out.println(product);
@@ -34,7 +34,7 @@ public class productCategoryTest {
     }
 
     @Test
-    public void CreateProducCategory() {
+    public void CreateProductCategory() {
         ArrayList<ProductCategory> list = new ArrayList<>();
         ProductCategory Electronics = new ProductCategory(
                 "Electronics",

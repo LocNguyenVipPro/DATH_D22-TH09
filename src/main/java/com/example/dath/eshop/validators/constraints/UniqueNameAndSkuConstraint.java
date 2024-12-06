@@ -9,47 +9,47 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ReflectionUtils;
 
-import com.example.dath.eshop.services.UserService;
-import com.example.dath.eshop.validators.annotations.UserNameUnique;
+import com.example.dath.eshop.services.ProductService;
+import com.example.dath.eshop.validators.annotations.SkuAndNameUnique;
 
-public class UniqueEmailConstraint implements ConstraintValidator<UserNameUnique, Object> {
-    private String idField;
-    private String emailField;
-
+public class UniqueNameAndSkuConstraint implements ConstraintValidator<SkuAndNameUnique, Object> {
     @Autowired
-    private UserService userService;
+    private ProductService productService;
+
+    private String nameField;
+    private String skuField;
+    private String idField;
 
     @Override
-    public void initialize(UserNameUnique constraintAnnotation) {
+    public void initialize(SkuAndNameUnique constraintAnnotation) {
+        this.nameField = constraintAnnotation.nameField();
+        this.skuField = constraintAnnotation.skuField();
         this.idField = constraintAnnotation.idField();
-        this.emailField = constraintAnnotation.emailField();
     }
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true; // Không cần kiểm tra khi giá trị là null
+            return true; // Không cần kiểm tra nếu giá trị là null
         }
 
-        // Lấy giá trị từ các trường ID và email
         Optional<Object> idValue = getFieldValue(value, idField);
-        Optional<Object> emailValue = getFieldValue(value, emailField);
+        Optional<Object> nameValue = getFieldValue(value, nameField);
+        Optional<Object> skuValue = getFieldValue(value, skuField);
 
-        if (emailValue.isEmpty()) {
-            return true; // Email không có giá trị để kiểm tra
+        if (nameValue.isEmpty() || skuValue.isEmpty()) {
+            return true; // Nếu tên hoặc SKU không có giá trị, bỏ qua kiểm tra
         }
 
-        String email = ((String) emailValue.get()).trim();
+        String name = ((String) nameValue.get()).trim();
+        String sku = ((String) skuValue.get()).trim();
         Integer id = idValue.map(val -> (Integer) val).orElse(null);
 
-        // Kiểm tra tính duy nhất của email
-        boolean isValid = userService.checkUserNameUni(email, id);
+        boolean isValid = productService.checkNameAndSkuUnique(name, sku, id);
 
         if (!isValid) {
             context.disableDefaultConstraintViolation();
-
-            context.buildConstraintViolationWithTemplate("{user.email.unique}")
-                    .addPropertyNode(this.emailField)
+            context.buildConstraintViolationWithTemplate("{product.name.sku.unique}")
                     .addConstraintViolation();
         }
 
@@ -67,11 +67,14 @@ public class UniqueEmailConstraint implements ConstraintValidator<UserNameUnique
         if (fieldName == null || fieldName.isEmpty()) {
             return Optional.empty();
         }
+
         Field field = ReflectionUtils.findField(target.getClass(), fieldName);
         if (field == null) {
             return Optional.empty();
         }
+
         ReflectionUtils.makeAccessible(field);
+
         try {
             return Optional.ofNullable(field.get(target));
         } catch (IllegalAccessException e) {

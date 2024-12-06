@@ -32,7 +32,7 @@ public class ProductService {
     private CartLineItemRepositoty cartLineItemRepositoty;
 
     @Autowired
-    private CartReposttory cartReposttory;
+    private CartRepository cartReposttory;
 
     @Autowired
     private OrderLineItemRepository orderLineItemRepository;
@@ -398,5 +398,24 @@ public class ProductService {
         productDTOArrayList = toProductDTO(this.producsRepository.findByPriceSalePercentAndCategory(
                 priceRangeMin, priceRangeMax, saleRangeMin, saleRangeMax, categorySelected));
         return productDTOArrayList;
+    }
+
+    public boolean checkNameAndSkuUnique(String name, String sku, Integer id) {
+        // Nếu không có ID (sản phẩm mới), kiểm tra xem tên hoặc SKU đã tồn tại chưa
+        if (id == null || id == 0) {
+            return producsRepository.findProductByName(name) == null && producsRepository.findProductBySku(sku) == null;
+        }
+
+        // Nếu có ID (sản phẩm đang được cập nhật), kiểm tra xem tên và SKU có xung đột không
+        Product existingProduct = producsRepository.findById(id).orElse(null);
+        if (existingProduct == null) {
+            return false; // Sản phẩm không tồn tại
+        }
+
+        Product checkProductByName = producsRepository.findProductByName(name);
+        Product checkProductBySku = producsRepository.findProductBySku(sku);
+
+        return (checkProductByName == null || existingProduct.getName().equals(name))
+                && (checkProductBySku == null || existingProduct.getSku().equals(sku));
     }
 }

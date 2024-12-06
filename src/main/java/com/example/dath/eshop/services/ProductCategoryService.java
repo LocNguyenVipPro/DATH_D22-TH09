@@ -34,20 +34,18 @@ public class ProductCategoryService {
     private ProductService productService;
 
     public List<ProductCategory> findAll(String searchValue, Boolean isHide) {
-
         if (searchValue != null && !searchValue.trim().isEmpty()) {
             return productCategoryRepository.findByNameContaining(searchValue, isHide);
         }
-
         return productCategoryRepository.findAll(isHide);
     }
 
     public ProductCategory saveImage(ProductCategory productCategory, MultipartFile multipartFile) throws IOException {
-
         if (multipartFile != null && !multipartFile.isEmpty()) {
             String fileName = multipartFile.getOriginalFilename();
             productCategory.setImage(fileName);
             this.productCategoryRepository.save(productCategory);
+
             String directory = "public/images/categories/" + productCategory.getId();
             FileUploadUltil.saveFile(directory, fileName, multipartFile, null);
         }
@@ -56,54 +54,52 @@ public class ProductCategoryService {
 
     public void saveCategory(ProductCategory productCategory, MultipartFile multipartFile)
             throws IOException, ProductCategoryException {
-
+        productCategory = trimCategory(productCategory);
         if (productCategory.getId() == null || productCategory.getId().equals(0)) {
-            productCategory = trimCategory(productCategory);
             productCategory.setCreatedAt(new Date());
-            productCategory = this.saveImage(productCategory, multipartFile);
+            productCategory = saveImage(productCategory, multipartFile);
         } else {
-            ProductCategory existingCategory = this.productCategoryRepository
+            ProductCategory existingCategory = productCategoryRepository
                     .findById(productCategory.getId())
                     .orElseThrow(() -> new ProductCategoryException("Category not found."));
-
-            existingCategory = this.setDataForProductCategory(existingCategory, productCategory);
-            productCategory = this.saveImage(existingCategory, multipartFile);
+            productCategory = setDataForProductCategory(existingCategory, productCategory);
+            productCategory = saveImage(productCategory, multipartFile);
         }
-        this.productCategoryRepository.save(productCategory);
+        productCategoryRepository.save(productCategory);
     }
 
     public ProductCategory trimCategory(ProductCategory productCategory) {
-        productCategory.setName(productCategory.getName().trim());
-        productCategory.setDescription(productCategory.getDescription().trim());
-        productCategory.setSlug(productCategory.getSlug().trim());
+        if (productCategory.getName() != null)
+            productCategory.setName(productCategory.getName().trim());
+        if (productCategory.getDescription() != null)
+            productCategory.setDescription(productCategory.getDescription().trim());
+        if (productCategory.getSlug() != null)
+            productCategory.setSlug(productCategory.getSlug().trim());
         return productCategory;
     }
 
     @Transactional
     public void deleteCategory(Integer categoryId) throws ProductCategoryException, ProductException {
-        Optional<ProductCategory> categoryOptional = this.productCategoryRepository.findById(categoryId);
-        ProductCategory deleteCategory = categoryOptional.orElseThrow(
-                () -> new ProductCategoryException("Category with ID " + categoryId + " not found"));
-        // unlink category from product
-        List<Product> listProducts = this.productRepository.findAll(categoryId, true);
+        ProductCategory categoryToDelete = productCategoryRepository
+                .findById(categoryId)
+                .orElseThrow(() -> new ProductCategoryException("Category with ID " + categoryId + " not found"));
 
-        for (Product product : listProducts) {
+        List<Product> productsToDelete = productRepository.findAll(categoryId, true);
+        for (Product product : productsToDelete) {
             productService.delete(product.getId());
         }
 
-        deleteCategory.setDeletedAt(new Date());
-        deleteCategory.setIsActive(false);
-        this.productCategoryRepository.save(deleteCategory);
+        categoryToDelete.setDeletedAt(new Date());
+        categoryToDelete.setIsActive(false);
+        productCategoryRepository.save(categoryToDelete);
     }
 
     public ProductCategory findById(Integer id, Boolean isHide) throws ProductCategoryException {
-        Optional<ProductCategory> categoryOptional = null;
-
-        // check if category is deleted or no
+        Optional<ProductCategory> categoryOptional;
         if (isHide == null) {
-            categoryOptional = this.productCategoryRepository.findById(id);
+            categoryOptional = productCategoryRepository.findById(id);
         } else {
-            categoryOptional = this.productCategoryRepository.findById(id, isHide);
+            categoryOptional = productCategoryRepository.findById(id, isHide);
         }
 
         return categoryOptional.orElseThrow(
@@ -124,7 +120,6 @@ public class ProductCategoryService {
                 slugErrorMessage = "Category already exists with the provided slug";
             }
         } else {
-
             // If the id exists, check if the name or slug already exists in the database (excluding the current
             // category)
             ProductCategory existingCategoryByName = this.productCategoryRepository.findByName(name);
@@ -169,16 +164,16 @@ public class ProductCategoryService {
     }
 
     public void restoreCategory(Integer id) throws ProductCategoryException {
-        ProductCategory restoreCategory = this.findById(id, null);
+        ProductCategory restoreCategory = findById(id, null);
         restoreCategory.setIsActive(true);
         restoreCategory.setDeletedAt(new Date());
-        this.productCategoryRepository.save(restoreCategory);
+        productCategoryRepository.save(restoreCategory);
     }
 
     public ProductCategory setDataForProductCategory(ProductCategory productCategories, ProductCategory EditCategory) {
-        productCategories.setName(EditCategory.getName());
-        productCategories.setSlug(EditCategory.getSlug());
-        productCategories.setDescription(EditCategory.getDescription());
+        if (EditCategory.getName() != null) productCategories.setName(EditCategory.getName());
+        if (EditCategory.getSlug() != null) productCategories.setSlug(EditCategory.getSlug());
+        if (EditCategory.getDescription() != null) productCategories.setDescription(EditCategory.getDescription());
         productCategories.setUpdatedAt(new Date());
         return productCategories;
     }
