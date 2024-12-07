@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.example.dath.eshop.models.Product;
-import com.example.dath.eshop.repositories.ProductCategoryRepository;
-import com.example.dath.eshop.repositories.ProductRepository;
-import com.example.dath.eshop.services.ProductService;
+import com.example.dath.eshop.model.Product;
+import com.example.dath.eshop.repository.ProductCategoryRepository;
+import com.example.dath.eshop.repository.ProductRepository;
+import com.example.dath.eshop.service.ProductService;
 
 @SpringBootTest
 public class ProductsTest {

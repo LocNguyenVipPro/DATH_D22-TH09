@@ -1,6 +1,6 @@
 package com.example.dath.eshop.dto;
 
-import com.example.dath.eshop.models.Product;
+import com.example.dath.eshop.model.Product;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

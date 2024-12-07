@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.example.dath.eshop.models.Role;
-import com.example.dath.eshop.repositories.RoleRepository;
+import com.example.dath.eshop.model.Role;
+import com.example.dath.eshop.repository.RoleRepository;
 
 @SpringBootTest
 public class RolesTest {

@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.example.dath.eshop.models.Product;
-import com.example.dath.eshop.models.ProductCategory;
-import com.example.dath.eshop.repositories.ProductCategoryRepository;
+import com.example.dath.eshop.model.Product;
+import com.example.dath.eshop.model.ProductCategory;
+import com.example.dath.eshop.repository.ProductCategoryRepository;
 
 @SpringBootTest
 public class productCategoryTest {

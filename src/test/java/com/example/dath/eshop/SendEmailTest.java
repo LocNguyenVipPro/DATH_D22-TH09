@@ -3,7 +3,7 @@ package com.example.dath.eshop;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.example.dath.eshop.utilities.EmailSender;
+import com.example.dath.eshop.utility.EmailSender;
 
 @SpringBootTest
 public class SendEmailTest {

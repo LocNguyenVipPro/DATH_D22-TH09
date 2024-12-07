@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.example.dath.eshop.models.User;
-import com.example.dath.eshop.repositories.RoleRepository;
-import com.example.dath.eshop.repositories.UserRepository;
+import com.example.dath.eshop.model.User;
+import com.example.dath.eshop.repository.RoleRepository;
+import com.example.dath.eshop.repository.UserRepository;
 
 @SpringBootTest
 public class UserTest {
