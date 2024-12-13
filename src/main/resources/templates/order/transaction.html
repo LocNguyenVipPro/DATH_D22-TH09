@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div th:replace="component/fragmen ::header"></div>
+</head>
+<body>
+<div th:replace="component/fragmen ::Navbar"></div>
+
+<div th:if="${listOrderLineItem.size()==0}" >
+    <h3 class="text-center mt-5 text-lg font-bold mb-4 animate-pulse">Your Order History is Empty Click Here to Come to Shop <b><a th:href="@{/main-page}">Click Here</a></b></h3>
+    <div class="flex justify-center items-center">
+        <img alt="product-image" class="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200" th:src="@{/images/cute.png}">
+    </div>
+</div>
+<div th:if="${listOrderLineItem.size()!=0}" >
+    <div class="mt-16">
+        <h1 class="text-7xl text-center mt-5 text-lg font-bold mb-4 "><b>Lịch sử giao dịch</b></h1>
+    </div>
+</div>
+<form th:action="@{/cart/checkout}" method="post">
+    <div th:if="${listOrderLineItem.size()!=0}" class="bg-gray-100 h-screen py-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-2xl font-semi-bold mb-4">Order</h1>
+            <div th:replace="component/notification::announcement"></div>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="md:w-3/4">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <table class="w-full">
+                            <thead>
+                            <tr>
+                                <th class="text-left font-semibold">Sản phẩm</th>
+                                <th class="text-left font-semibold">Tổng số tiền</th>
+                                <th class="text-left font-semibold">Thuế</th>
+                                <th class="text-left font-semibold">Số lượng</th>
+                                <th class="text-left font-semibold">Số Tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <th:block th:each="OrderLineItem : ${listOrderLineItem}" >
+                                <div class=" ">
+                                    <input type="hidden" name="productIds" th:value="${OrderLineItem.getProductId().getId()}" />
+                                    <tr th:onclick="'window.location.href=\'/order/detail?oder-line-item-id=' + ${OrderLineItem.getId()} + '\''"  class="border-b border-blue-200 hover:bg-blue-100" >
+                                        <td class="py-4">
+                                            <div class="flex items-center">
+                                                <img class="h-16 w-16 mr-4" th:src="${OrderLineItem.getProductId().loadImages()}" alt="Product image">
+                                                <span class="font-semibold" >[[${OrderLineItem.getProductId().getName()}]]</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4">
+                                            <span  class="block text-lg font-medium text-gray-900">$[[${OrderLineItem.getProductId().discountPrice}]]</span>
+                                        </td>
+                                        <td class="py-4">
+                                            <span  class="block text-lg font-medium text-gray-900">$[[${(OrderLineItem.getProductId().discountPrice*OrderLineItem.getProductId().getTax)/100}]]</span>
+                                        </td>
+                                        <td class="py-4">
+                                            <div class="flex items-center">
+                                                <label>
+                                                    <input class="text-center w-8"  th:value="${OrderLineItem.quantity}"></input>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="py-4">
+                                            <span  class="block text-lg font-medium text-gray-900">$[[${(((OrderLineItem.getProductId().discountPrice*OrderLineItem.getProductId().getTax)/100)+OrderLineItem.getProductId().discountPrice)*OrderLineItem.quantity}]]</span>
+                                        </td>
+                                    </tr>
+                                </div>
+                            </th:block>
+                            </tbody>
+                        </table>
+                        <div class="text-gray-700 body-font overflow-hidden bg-white mt-4">
+                            <nav aria-label="Page navigation example" class="text-center">
+                                <ul class="inline-flex -space-x-px text-base h-10">
+                                    <li><a th:href="@{'/order/history/1'}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">First</a></li>
+                                    <li><a th:href="@{'/order/history/' + ${pageNum - 1}}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a></li>
+
+                                    <th:block th:if="${totalPage < 5}">
+                                        <th:block th:each="pageNumber : ${#numbers.sequence(1, totalPage)}">
+                                            <li>
+                                                <a th:href="@{'/order/history/' + ${pageNumber}}"
+                                                   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                   th:classappend="${pageNumber == pageNum ? 'bg-blue-500 text-white' : ''}">
+                                                    [[${pageNumber}]]
+                                                </a>
+                                            </li>
+                                        </th:block>
+                                    </th:block>
+
+                                    <th:block th:if="${totalPage >= 5}">
+                                        <th:block th:if="${pageNum < 3}">
+                                            <th:block th:each="pageNumber : ${#numbers.sequence(1, 5)}">
+                                                <li>
+                                                    <a th:href="@{'/order/history/' + ${pageNumber}}"
+                                                       class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                       th:classappend="${pageNumber == pageNum ? 'bg-blue-500 text-white' : ''}">
+                                                        [[${pageNumber}]]
+                                                    </a>
+                                                </li>
+                                            </th:block>
+                                        </th:block>
+
+                                        <th:block th:if="${pageNum >= 3}">
+                                            <th:block th:if="${pageNum <= totalPage - 2}">
+                                                <th:block th:each="pageNumber : ${#numbers.sequence(pageNum - 2, pageNum + 2)}">
+                                                    <li>
+                                                        <a th:href="@{'/order/history/' + ${pageNumber}}"
+                                                           class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                           th:classappend="${pageNumber == pageNum ? 'bg-blue-500 text-white' : ''}">
+                                                            [[${pageNumber}]]
+                                                        </a>
+                                                    </li>
+                                                </th:block>
+                                            </th:block>
+
+                                            <th:block th:if="${pageNum > totalPage - 2}">
+                                                <th:block th:each="pageNumber : ${#numbers.sequence(totalPage - 4, totalPage)}">
+                                                    <li>
+                                                        <a th:href="@{'/order/history/' + ${pageNumber}}"
+                                                           class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                           th:classappend="${pageNumber == pageNum ? 'bg-blue-500 text-white' : ''}">
+                                                            [[${pageNumber}]]
+                                                        </a>
+                                                    </li>
+                                                </th:block>
+                                            </th:block>
+                                        </th:block>
+                                    </th:block>
+
+                                    <li><a th:href="@{'/order/history/' + ${pageNum + 1}}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Next</a></li>
+                                    <li><a th:href="@{'/order/history/' + ${totalPage}}" class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Last</a></li>
+                                </ul>
+                            </nav>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="md:w-1/4">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-center text-lg font-semi-bold mb-4">Summary</h2>
+                        <div class="flex justify-between mb-2">
+                            <span>Sub Total</span>
+                            <span id="subTotal" class="text-green-600" >[[${order.totalAmount-order.taxAmount}]]</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span>Taxes</span>
+                            <span id="taxTotal" class="text-green-600">[[${order.taxAmount}]]</span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-semi-bold">Total</span>
+                            <span class="font-semi-bold text-green-600" id="totalAmount">[[${order.totalAmount}]]</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<footer th:replace="component/fragmen::footer" class="mt-10"></footer>
+
+</body>
+</html>

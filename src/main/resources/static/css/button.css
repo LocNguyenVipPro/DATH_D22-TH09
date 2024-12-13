@@ -1,0 +1,32 @@
+/* CSS */
+#previous-btn,
+#next-btn {
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    font-size: 50px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: black;
+    cursor: pointer;
+    opacity: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#previous-btn:hover,
+#next-btn:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.pagination-buttons:hover #previous-btn,
+.pagination-buttons:hover #next-btn {
+    opacity: 1;
+}
+
+.center-parent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

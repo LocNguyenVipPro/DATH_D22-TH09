@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div th:replace="component/fragmen ::header"></div>
+    <script th:src="@{/javascripts/cart/cart.js}" type="text/javascript"></script>
+</head>
+<body>
+    <div th:replace="component/fragmen ::Navbar"></div>
+
+    <div id="confirmationMessage" th:replace="component/notification::alertConfirm"></div>
+
+    <form id="submitForm" method="post" th:action="@{/order/purchase}" class="bg-gray-50">
+        <div class="bg-gray-50">
+        <input type="hidden" id="selectProduct" name="productId" th:value="${cartProduct.id}" />
+        <h1 class="text-7xl text-center mt-9 font-bold  mb-4">Chi tiết sản phẩm</h1>
+        <div th:replace="component/notification::alertMessage"></div>
+        <input type="hidden" id="message" th:value="${message}" />
+        <div class="container mx-auto p-2">
+            <div class="container px-1 py-12 mx-auto bg-white">
+                <div class="lg:w-4/5 mx-auto flex flex-wrap">
+                    <div class="w-1/2 float-left">
+                        <img alt="ecommerce" class="w-full h-auto object-cover rounded border border-gray-100" th:src="@{${cartProduct.loadImages()}}">
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:pl-10 lg:pb-6 mt-6 lg:mt-0">
+                        <div class="container mx-auto max-w-2xl">
+                           <div class="px-4 py-2">
+                                  <span class="text-6xl font-bold text-gray-700">
+                                    [[${cartProduct.name}]]
+                                  </span>
+                               <div class="leading-relaxed py-2">
+                                   <p class="text-lg font-mono leading-normal text-gray-700 opacity-70 ">
+                                       <span th:text="'Description :'+${cartProduct.getContent()}"></span>
+                                   </p>
+                               </div>
+                               <div class="flex py-2 items-center ">
+                                   <div class="flex mr-4">
+                                       <span class="mr-3">Quantity</span>
+                                       <div class="flex items-center border border-gray-300 rounded">
+                                           <button type="button" class="h-6 w-6 flex items-center justify-center rounded-l cursor-pointer" onclick="decrementQuantity()">-</button>
+                                           <input type="number" class="outline-none text-center w-16 h-6 border-r border-l border-gray-300" id="quantity" name="quantity" value="1">
+                                           <button type="button" class="h-6 w-6 flex items-center justify-center rounded-r cursor-pointer" onclick="incrementQuantity()">+</button>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                        </div>
+                        <div class="container mx-auto max-w-2xl mt-4 border border-gray-200 px-5 py-2">
+                            <input type="hidden" id="originalProductPrice" name="originalProductPrice" th:value="${cartProduct.price}" />
+                            <input type="hidden" id="originalDiscountProductPrice" name="originalDiscountProductPrice" th:value="${cartProduct.getDiscountPrice()}" />
+                            <div class="flex flex-col">
+                                <div class="     rounded-md p-4">
+                                    <h3 class="font-bold text-gray-700">Order Details</h3>
+                                    <div class="flex flex-row justify-between py-2">
+                                        <div class="text-gray-600">Price</div>
+                                        <div id="price" class="line-through text-red-500 text-gray-600">$[[${cartProduct.price}]]</div>
+                                    </div>
+                                    <div class="flex flex-row justify-between py-2">
+                                        <div class="text-gray-600">Discount Price</div>
+                                        <div id="discountPrice" class="text-green-500">$[[${cartProduct.getDiscountPrice()}]]</div>
+                                    </div>
+                                    <div class="flex flex-row justify-between py-2">
+                                        <div class="text-gray-600">Tax Percent</div>
+                                        <div id="taxPercent" class="text-green-500">[[${cartProduct.tax}]]%</div>
+                                    </div>
+                                    <div class="flex flex-row justify-between py-2">
+                                        <div class="text-gray-600">Tax Amount</div>
+                                        <div id="taxAmount" class="text-green-500"></div>
+                                    </div>
+                                </div>
+                                <div class=" rounded-md p-4 mt-4">
+                                    <h3 class="font-bold text-gray-700">Order Total</h3>
+                                    <diacv class="flex flex-row justify-between py-2 font-bold text-lg">
+                                        <div>Total</div>
+                                        <div id="totalPrice" class="text-green-500"></div>
+                                    </diacv>
+                                    <p id="totalLabel" class="text-gray-600 mt-2"></p>
+                                </div>
+                                <div class="flex justify-center items-center space-x-4">
+                                    <button onclick="purchase()" type="button" class="py-6 text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800 hover:transform hover:scale-110 transition duration-300">
+                                        <i class="fas fa-shopping-cart fa-2x"></i>
+                                        <span class="ml-2">Mua hàng</span>
+                                    </button>
+                                    <button onclick="addCartItem()" id="addToCart" type="button" class="py-6 text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800 hover:transform hover:scale-110 transition duration-300">
+                                        <i class="fas fa-shopping-cart fa-2x"></i>
+                                        <span class="ml-2">Thêm vào giỏ hàng</span>
+                                    </button>
+                                    <button type="button" id="favoriteButton" class="rounded-full w-12 h-12 bg-gray-200 p-0 border-0 flex items-center justify-center text-gray-500 hover:text-red-500 transition duration-300" onclick="toggleFavorite()">
+                                        <svg id="favoriteIcon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-6 h-6" viewBox="0 0 24 24">
+                                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </form>
+    <div th:replace="component/fragmen::relateProduct"></div>
+    <div class="mt-20">
+        <footer th:replace="component/fragmen::footer"></footer>
+    </div>
+</body>
+</html>

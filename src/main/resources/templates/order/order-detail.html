@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <div th:replace="component/fragmen ::header"></div>
+</head>
+<body class="flex flex-col min-h-screen">
+<div style="background-color: #F2F2F2">
+
+  <div th:replace="component/fragmen ::Navbar"></div>
+
+  <h1 class="text-7xl text-center mt-5 text-lg font-bold mb-4 "><b>Chi tiết sản phẩm</b></h1>
+  <div class="container mx-auto bg-white pb-8 border border-200">
+    <div class="container px-5 py-24 mx-auto">
+      <div class="lg:w-4/5 mx-auto flex flex-wrap">
+        <div class="w-1/2">
+          <img alt="ecommerce" class="w-full h-auto object-cover object-center" th:src="@{${viewOderLineItem.getProductId().loadImages()}}">
+        </div>
+        <div class="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
+          <div class="px-4 py-2">
+            <span class="text-6xl font-bold text-gray-700">[[${viewOderLineItem.getProductId().name}]]</span>
+            <div class="leading-relaxed py-2">
+              <div class="leading-relaxed py-2">
+                <p class="text-sm font-mono leading-normal text-gray-700 opacity-70 py-2">
+                  <span class="font-bold ">Description :</span>
+                  <span th:text="${viewOderLineItem.getProductId().getContent()}"></span>
+                </p>
+              </div>
+              <div class="leading-relaxed">
+                <p class="text-sm font-mono leading-normal text-gray-700 opacity-70 py-2">
+                  <span class="font-bold ">Category :</span>
+                  <span th:text="${viewOderLineItem.getProductId().getListProductCategories()}"></span>
+                </p>
+              </div>
+              <div class="leading-relaxed">
+                <p class="text-sm font-mono leading-normal text-gray-700 opacity-70 py-2">
+                  <span class="font-bold ">Buy At :</span>
+                  <span th:text="${viewOderLineItem.createdAt}"></span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="container mx-auto max-w-2xl">
+            <div class="flex flex-col">
+              <div class="border border-gray-200 rounded-md p-4">
+                <h3 class="font-bold text-gray-700">Order Details</h3>
+
+                <div class="flex flex-row justify-between py-2">
+                  <div class="text-gray-600">Subtotal</div>
+                  <div class="text-gray-600">$[[${viewOderLineItem.getSubTotalAmount}]]</div>
+                </div>
+
+
+                <div class="flex flex-row justify-between py-2">
+                  <div class="text-gray-600">Tax Total</div>
+                  <div class="text-gray-500">$[[${viewOderLineItem.getTaxTotalAmount}]]</div>
+                </div>
+              </div>
+
+              <div class="border border-gray-200 rounded-md p-4 mt-4">
+                <h3 class="font-bold text-gray-700">Order Total</h3>
+
+                <div class="flex flex-row justify-between py-2 font-bold text-lg">
+                  <div>Total</div>
+                  <div>$[[${viewOderLineItem.getTotalAmount}]]</div>
+                </div>
+                <p th:if="${viewOderLineItem.getTotalAmount==0}" class="text-gray-600 mt-2">Congratulation! You Get [[${viewOderLineItem.productId.getName}]] Free.</p>
+                <p th:if="${viewOderLineItem.getTotalAmount!=0}" class="text-gray-600 mt-2">Please pay $[[${viewOderLineItem.getTotalAmount}]] upon delivery.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<footer class="bg-gray-200 w-full">
+ </footer>
+</body>
+</html>

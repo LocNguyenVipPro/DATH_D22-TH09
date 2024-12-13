@@ -1,0 +1,114 @@
+    <!DOCTYPE html>
+    <html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+    <head>
+        <div th:replace="component/fragmen ::header"></div>
+    </head>
+    <script th:src="@{/javascripts/cart/shopping-cart.js}" type="text/javascript"></script>
+    <div id="confirmationMessage" th:replace="component/notification::alertConfirm"></div>
+    <input type="hidden" id="message"  th:value="${message}" />
+    <div th:replace="component/fragmen ::Navbar"></div>
+    <div th:if="${listCartLineItem.size()==0}" class="mt-20">
+        <div th:replace="component/notification::alertMessage"></div>
+        <h3 class="text-center mt-5 text-lg font-bold text-red-500 mb-4 animate-pulse">Your Cart is Empty Click Here to Come to Shop <b class="text-blue-300"><a th:href="@{/main-page}">Click Here</a></b></h3>
+        <div class="flex justify-center items-center">
+            <img alt="product-image" class="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200" th:src="@{/images/cute.png}">
+        </div>
+    </div>
+    <div th:if="${listCartLineItem.size()!=0}">
+        <div class="item-center">
+            <div th:replace="component/notification::alertMessage"></div>
+            <h1 class="text-7xl text-center mt-5 text-lg font-bold  mb-4 "><b>Giỏ Hàng</b></h1>
+        </div>
+    </div>
+    <div th:replace="component/notification::announcement"></div>
+    <form id="submitForm" th:action="@{/cart/checkout}" method="post">
+        <div th:if="${listCartLineItem.size()!=0}" class="bg-gray-100 h-screen py-8">
+            <div class="container mx-auto px-4">
+                <h1 class="text-2xl font-semibold mb-4">Shopping Cart</h1>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="md:w-3/4">
+                        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                            <table class="w-full">
+                                <thead>
+                                <tr>
+                                    <th class="text-left font-semi-bold">Sản Phẩm</th>
+                                    <th class="text-left font-semi-bold">Giá</th>
+                                    <th class="text-left font-semi-bold">Số lượng</th>
+                                    <th class="text-left font-semi-bold">Tổng tiền</th>
+                                    <th class="text-left font-semi-bold">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:each="CartLineItems : ${listCartLineItem}" >
+                                    <input type="hidden" name="productIds" th:value="${CartLineItems.getProductId().getId()}" />
+                                    <input type="hidden" th:id="'originalProductPrice'+${CartLineItems.getId()}" th:value="${CartLineItems.getProductId().price}" />
+                                    <input type="hidden" th:id="'originalDiscountProductPrice'+${CartLineItems.getId()}" th:value="${CartLineItems.getProductId().discountPrice}" />
+                                    <input type="hidden" th:id="'taxPrice'+${CartLineItems.getId()}" th:value="${CartLineItems.getProductId().tax}" />
+                                    <tr >
+                                        <td class="py-4">
+                                            <div class="flex items-center">
+                                                <img class="h-16 w-16 mr-4" th:src="${CartLineItems.getProductId().loadImages()}" alt="Product image">
+                                                <span class="font-semibold" >[[${CartLineItems.getProductId().getName()}]]</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4">
+                                            <span  class="block text-lg font-medium text-gray-900">$[[${CartLineItems.getProductId().discountPrice}]]</span>
+                                        </td>
+                                        <td class="py-4">
+                                            <div class="flex items-center">
+                                                <button class="border rounded-md py-2 px-4 mr-2" type="button" th:onclick="decrementQuantity([[${CartLineItems.getId}]])">-</button>
+                                                <input class="text-center w-8" th:id="'quantityInput'+${CartLineItems.getId()}" name="quantities" th:value="${CartLineItems.quantity}" oninput="updateHiddenQuantity(${CartLineItems.getId()}, this.value)"></input>
+                                                <input type="hidden" class="text-center w-8" th:id="'quantityInputHidden'+${CartLineItems.getId()}"  th:value="${CartLineItems.quantity}" ></input>
+                                                <button class="border rounded-md py-2 px-4 ml-2" type="button" th:onclick="incrementQuantity([[${CartLineItems.getId()}]])">+</button>
+                                            </div>
+                                        </td>
+                                        <td class="py-4">
+                                            <span th:id="discountPrice+${CartLineItems.getId()}" class="block text-lg font-medium text-gray-900">$[[${CartLineItems.getProductId().discountPrice*CartLineItems.Quantity}]]</span>
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            <div class="flex items-center space-x-5">
+                                                <a th:href="@{/cart(productId=${CartLineItems.getProductId().getId()})}" class="text-blue-500 cursor-pointer"><i class="fas fa-eye"></i></a>
+                                                <a th:onclick="deleteCartLineItem([[${CartLineItems.id}]])"  class="text-red-500"><i class="fas fa-trash-alt cursor-pointer"></i></a>
+                                                <input type="hidden" id="cartLineItemId" name="cartLineItemId" th:value="${CartLineItems.id}"/>
+                                                <input type="hidden" id="quantity" name="quantity" th:value="${CartLineItems.quantity}" class="cursor-pointer"/>
+                                                <a class="text-green-500 cursor-pointer" th:onclick="buyInCartLineItem([[${CartLineItems.id}]])"><i class="fab fa-cc-paypal cursor-pointer"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </a>
+                                </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="md:w-1/4">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-center text-lg font-semi-bold mb-4">Summary</h2>
+                            <div class="flex justify-between mb-2">
+                                <span>Subtotal</span>
+                                <input type="hidden" id="subTotalHidden" th:value="${shoppingCart.getTotalAmount() - shoppingCart.getTaxAmount()}"></input>
+                                <span class="text-green-500" id="subTotal" th:text="'$'+${shoppingCart.getTotalAmount() - shoppingCart.getTaxAmount()}"></span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Taxes</span>
+                                <input type="hidden" id="taxTotalHidden" th:value="${shoppingCart.getTaxAmount()}"></input>
+                                <span class="text-green-500" id="taxTotal" th:text="'$'+${shoppingCart.getTaxAmount()}"></span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semi-bold">Total</span>
+                                <span  class="text-green-500 font-bold" id="totalAmount" th:text="'$'+${shoppingCart.getTotalAmount()}"></span>
+                            </div>
+                            <button onclick="checkOut()" type="button" class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full" >Checkout</button>
+                            <button onclick="clearAll()" type="button"  class="bg-red-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Clear All</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <footer th:replace="component/fragmen::footer"></footer>
+    </body>
+
+    </html>

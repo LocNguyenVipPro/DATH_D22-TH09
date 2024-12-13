@@ -1,0 +1,315 @@
+    <!DOCTYPE html>
+    <html lang="en"  xmlns:th="http://www.thymeleaf.org"
+          xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <head  th:fragment="header">
+            <meta charset="UTF-8">
+            <title>[[${pageTitle}]]</title>
+
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+            <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div th:fragment="Navbar">
+                    <nav id="navbar" class="relative py-4 border border-gray-100 sticky pb-2 w-full z-50 fixed top-0  transition-transform duration-300 transform bg-blue-300" >
+                    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+                        <div class="relative flex items-center justify-between" style="height:100px">
+                            <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                                <!-- Mobile menu button-->
+                                <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                                    <span class="absolute -inset-0.5"></span>
+                                    <span class="sr-only">Open main menu</span>
+                                    <!-- Icon when menu is closed. -->
+                                    <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                    </svg>
+                                    <!-- Icon when menu is open. -->
+                                    <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
+                                <a th:href="@{/main-page}">
+                                    <div class="flex-shrink-0 flex items-center">
+                                        <img class="h-24 w-full" th:src="@{/images/2.png}" alt="Your Company">
+                                        <h1 class="text-3xl normal-case font-bold  text-black-600 uppercase tracking-widest">DN.SHOP</h1>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+
+                                <div class="hidden sm:ml-6 sm:block">
+                                    <div class="flex space-x-4 item-center">
+                                        <a th:href="@{/main-page}" class="hover:underline text-black-300 text-2xl rounded-md px-3 py-2 flex items-center text-sm font-medium" th:classappend="${isChoice=='Shop'} ? 'underline' : ''" sec:authorize="hasRole('User')">Shop</a>
+                                        <a th:href="@{/products}" class="hover:underline text-black-300 text-2xl rounded-md px-3 py-2 flex items-center text-sm font-medium" th:classappend="${isChoice=='Products'}?'underline':''" sec:authorize="hasRole('Admin')">Products</a>
+                                        <a th:href="@{/category}" class="hover:underline text-black-300 text-2xl rounded-md px-3 py-2 flex items-center text-sm font-medium" th:classappend="${isChoice=='Category'}?'underline':''" sec:authorize="hasRole('Admin')">Category</a>
+                                        <a href="/#" class="hover:underline text-black-300 text-lg rounded-md px-3 py-2 flex items-center text-sm font-medium" th:classappend="${isChoice=='Category'}?'underline':''" sec:authorize="hasRole('Admin')"></a>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                                <div class="relative text-gray-600">
+                                    <input type="search" name="search" placeholder="Search" class="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none">
+                                    <button type="submit" class="absolute right-0 top-0 mt-3 mr-4">
+                                        <svg class="text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path d="M20.899 19.314l-4.428-4.428A7.95 7.95 0 0018 10c0-4.418-3.582-8-8-8s-8 3.582-8 8 3.582 8 8 8c1.708 0 3.273-.53 4.579-1.427l4.428 4.428c.098.098.226.146.354.146s.256-.049.354-.146a.5.5 0 000-.708zM4 10c0-3.309 2.691-6 6-6s6 2.691 6 6-2.691 6-6 6-6-2.691-6-6z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <a th:href="@{/wishlist}" type="button" class="relative rounded-full  p-2 text-white-400 hover:text-green hover: transform transition duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <span class="absolute -inset-2"></span>
+                                    <span class="sr-only">View cart</span>
+                                    <ion-icon name="heart-outline" class="h-8 w-8"></ion-icon>
+                                </a>
+                                <a th:href="@{/cart/shopping-cart}" type="button" class="relative rounded-full  p-2 text-white-400 hover:text-green hover: transform transition duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <span class="absolute -inset-2"></span>
+                                    <span class="sr-only">View cart</span>
+                                    <ion-icon name="cart-outline" class="h-8 w-8"></ion-icon>
+                                </a>
+                                <!-- Profile dropdown -->
+                                <div class="relative ml-3">
+                                            <button type="button"
+                                                    class="relative flex rounded-full  text-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 user-menu-button"
+                                                    id="user-menu-button"
+                                                    aria-expanded="false"
+                                                    aria-haspopup="true">
+                                                <span class="absolute -inset-1.5"></span>
+                                                <span class="sr-only">Open user menu</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                                </svg>
+                                            </button>
+
+                                    <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dropdown-menu hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                        <a th:href="@{/users/edit}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Thông tin chi tiết</a>
+                                        <a th:href="@{/users/update_information}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Thông tin cá nhân</a>
+                                        <a th:href="@{/order/history/1}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Lịch sử giao dịch</a>
+                                        <form th:action="@{/logout}" method="post">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <button type="submit" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-3">Đăng xuất</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </nav>
+                <script th:src="@{/javascripts/fragment/navigation.js}" type="text/javascript"></script>
+        </div>
+
+        <div th:fragment="relateProduct">
+            <div th:if="${listRelatedProducts.size()!=0}">
+                <div class="border-t-4 border-gray-200 mt-20 container mx-auto bg-white pb-8">
+                    <div  class="flex items-center">
+                        <p class="px-4 h-16 flex items-center uppercase text-stone-500">Related Product</p>
+                    </div>
+                    <div class="mt-6 grid grid-cols-6 gap-2">
+                        <div th:each="Product : ${listRelatedProducts}">
+                            <a th:href="@{cart (productId=${Product.id})}">
+                                <div class="p-2 bg-white rounded shadow-md border border-gray-200 transform transition duration-300 hover:scale-105 hover:border-blue-500">
+                                    <div class="relative w-full mb-1 sm:mb-1 h-32 sm:h-32">
+                                        <img th:src="@{${Product.loadImages}}" alt="Product Image" class="object-cover w-full h-full rounded">
+                                    </div>
+                                    <div class="bg-gray-100">
+                                        <div class="p-2 sm:p-2">
+                                            <h2 class="text-xs sm:text-sm cursor-pointer hover:text-gray-900 product-name">
+                                                <b>Name :</b> [[${Product.name}]]
+                                            </h2>
+                                            <h2 class="mt-1 text-xs sm:text-xs cursor-pointer hover:text-gray-900 product-name">
+                                                <b>Description :</b> [[${Product.content}]]
+                                            </h2>
+                                            <h2 class="mt-1 text-xs sm:text-xs cursor-pointer hover:text-gray-900 product-name">
+                                                <b>SKU :</b> [[${Product.sku}]]
+                                            </h2>
+                                            <div class="mt-1 text-xs font-semibold">
+                                                <b>Price :</b>
+                                                <del class="text-red-500">[[${Product.price}]]</del>
+                                                <span>[[${Product.discountPrice}]]</span>
+                                            </div>
+                                            <form th:action="@{/cart}" method="get">
+                                                <input type="hidden" name="productId" th:value="${Product.id}" />
+                                                <button type="submit" class="mt-2 text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs sm:text-xs px-4 py-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800">
+                                                    <i class="fas fa-shopping-cart fa-1x"></i>
+                                                    <span class="ml-1">Add to Cart</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div th:fragment="thank_you_message">
+            <section class="bg-white py-8">
+                <div class="container py-8 px-6 mx-auto">
+                    <h2 class="uppercase tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl mb-8">Thank You for Visiting</h2>
+
+                    <p class="mt-8 mb-8">
+                        We extend our heartfelt thanks to you for taking the time to visit our store. SDN is committed to providing the finest quality technology products along with attentive and professional customer service.
+                    </p>
+
+                    <p class="mb-8">
+                        Here at SDN, we specialize in offering a wide range of cutting-edge technological products to meet your needs. Our goal is to enhance your digital experience and make technology more accessible to everyone.
+                    </p>
+                </div>
+            </section>
+        </div>
+
+            <footer th:fragment="footer">
+                <div class="bg-white">
+                    <hr class="my-8 border-2 border-gray-200">
+                    <div class="container flex px-3 py-8 ">
+                        <div class="w-full mx-auto flex flex-wrap">
+                            <div class="flex w-full lg:w-1/2 ">
+                                <div class="px-3 md:px-0">
+                                    <h3 class="font-bold text-gray-900">About</h3>
+                                    <p class="py-4">
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas vel mi ut felis tempus commodo nec id erat. Suspendisse consectetur dapibus velit ut lacinia.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex w-full lg:w-1/2 lg:justify-end lg:text-right mt-6 md:mt-0">
+                                <div class="px-3 md:px-0">
+                                    <h3 class="text-left font-bold text-gray-900">Social</h3>
+
+                                    <div class="w-full flex items-center py-4 mt-0">
+                                        <a href="#" class="mx-2">
+                                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path>
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="mx-2">
+                                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="mx-2">
+                                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                                <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="mx-2">
+                                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </footer>
+                <div th:fragment="filter">
+                    <div th:if="${isChoiceCategory==null}" style="text-align: center;" class="flex items-center">
+                        <div class="flex">
+                            <button id="dropdownHoverButtonRanger" data-dropdown-toggle="dropdownHover12" data-dropdown-trigger="hover" class="ml-5 px-9 bg-transparent hover:bg-blue-500 text-blue-700 font-bold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" type="button">Price search<svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                        </button>
+                            <div id="dropdownHover12" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
+                                    <li>
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="checkbox-item-12" name="price-range" type="checkbox" value="0-1k" onclick="handleCheckbox(this,'dropdownHoverButtonRanger')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="checkbox-item-12" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">ranges from 0k-1k$</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="checkbox-item-13" name="price-range" type="checkbox" value="1k-2k" onclick="handleCheckbox(this,'dropdownHoverButtonRanger')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="checkbox-item-13" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">ranges from 1k-2k$</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="checkbox-item-14" name="price-range" type="checkbox" value="2k-3k" onclick="handleCheckbox(this,'dropdownHoverButtonRanger')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="checkbox-item-14" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">ranges from 2k-3k$</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="checkbox-item-15" name="price-range" type="checkbox" value="3k-4k" onclick="handleCheckbox(this,'dropdownHoverButtonRanger')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="checkbox-item-15" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">ranges from 3k-4k$</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="checkbox-item-8" name="price-range" type="checkbox" value="over4k" onclick="handleCheckbox(this,'dropdownHoverButtonRanger')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="checkbox-item-8" class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">ranges from over 4k$</label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+                            <button id="dropdownHoverButton" data-dropdown-toggle="dropdownHover" data-dropdown-trigger="hover" class="ml-5 bg-transparent hover:bg-blue-500 text-blue-700 font-bold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" type="button">Discount search<svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div id="dropdownHover" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
+                                    <li >
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="dashboard-checkbox" name="saleRange" onclick="handleCheckbox(this,'dropdownHoverButton')" value="0%-20%" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="dashboard-checkbox" class="font-bold ml-2">Discount 0%-20%</label>
+                                        </div>
+                                    </li>
+                                    <li >
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="settings-checkbox" name="saleRange" onclick="handleCheckbox(this,'dropdownHoverButton')" value="20%-40%" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="settings-checkbox" class="font-bold ml-2">Discount 20%-40%</label>
+                                        </div>
+                                    </li>
+                                    <li >
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="earnings-checkbox" name="saleRange" onclick="handleCheckbox(this,'dropdownHoverButton')" value="40%-60%" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="earnings-checkbox" class="font-bold ml-2">Discount 40%-60%</label>
+                                        </div>
+                                    </li>
+                                    <li >
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="signout-checkbox" name="saleRange" onclick="handleCheckbox(this,'dropdownHoverButton')" value="60%-80%" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="signout-checkbox" class="font-bold ml-2">Discount 60%-80%</label>
+                                        </div>
+                                    </li>
+                                    <li >
+                                        <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            <input id="signout-checkbox3" name="saleRange" onclick="handleCheckbox(this,'dropdownHoverButton')" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="signout-checkbox3" value="80%-100%" class="font-bold ml-2">Discount 80%-100%</label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <button onclick="handleCheckbox(this,'clearAll')"  class="ml-3 relative inline-flex items-center justify-center p-0.5  me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                            <span class="inline-flex items-center justify-center relative px-2 py-4 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                                <span class="ml-2">Clear Filter</span>
+                            </span>
+                            </button></div>
+
+
+                    </div>
+                </div>
+    </body>
+
+    </html>

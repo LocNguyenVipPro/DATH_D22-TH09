@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <div th:replace="fragmen ::header"></div>
+    <title>Title</title>
+</head>
+<body>
+<div  th:fragment="announcement">
+    <div  th:if="${errorMessage}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" >
+        <div class="text-center">
+            <strong class="font-bold">Error: </strong>
+            <span th:text="${errorMessage}" class="block sm:inline"></span>
+        </div>
+    </div>
+    <div th:if="${Message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4" id="successMessage">
+        <div class="text-center">
+            <strong class="font-bold">Success: </strong>
+            <span th:text="${Message}" class="block sm:inline"></span>
+        </div>
+    </div>
+        <script th:src="@{/javascripts/common/set-time-out.js}" type="text/javascript"></script>
+</div>
+<div th:fragment="alertMessage">
+    <div id="successAlert" class="alert alert-success flex items-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative hidden" role="alert" style="width: 0; left: 50%; transform: translateX(-50%);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>Your purchase has been confirmed!</span>
+    </div>
+    <div id="failAlert" role="alert" class="alert alert-error flex items-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative hidden" style="width: 200px; left: 50%; transform: translateX(-50%);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>Error! Task failed successfully.</span>
+    </div>
+
+    <script th:src="@{/javascripts/common/show-alert.js}" type="text/javascript"></script>
+</div>
+
+<div th:fragment="alertConfirm">
+    <div class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50" id="confirmationDialog">
+        <div class="bg-white rounded-lg shadow-lg m-4 sm:m-8 w-full max-w-md">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-medium text-gray-800">Confirmation</h3>
+                <button onclick="hideConfirmationDialog()" type="button" class="text-gray-500 hover:text-gray-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 text-center">
+
+                <h3 id="messageDialog" class="text-base font-normal text-gray-600">Are you sure you want to proceed?</h3>
+
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button id="confirmButton" onclick="confirmAction()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Xác nhận
+                    </button>
+                    <button id="hideButton" onclick="hideConfirmationDialog()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        Hủy bỏ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/javascripts/common/alert-confirm.js}" type="text/javascript"></script>
+</div>
+
+</body>
+</html>

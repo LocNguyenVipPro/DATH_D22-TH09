@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div th:replace="component/fragmen ::header"></div>
+</head>
+<body>
+<div style="background-color: #F2F2F2">
+    <div th:replace="component/fragmen ::Navbar"></div>
+
+        <h1 class="text-7xl text-center mt-5 font-bold text-red-500 mb-4">Detail Product</h1>
+        <div class="container mx-auto bg-white p-2">
+            <div class="container px-1 py-12 mx-auto">
+                <div class="lg:w-4/5 mx-auto flex flex-wrap">
+                    <div class="w-1/2 float-left shadow-xl">
+                        <img alt="ecommerce" class="w-full h-auto object-cover rounded border border-blue-200" th:src="@{${productDetail.loadImages()}}">
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:pl-10 lg:pb-6 mt-6 lg:mt-0">
+                        <div class="container mx-auto max-w-2xl border border-blue-200 shadow-xl">
+                            <div class="px-4 py-2">
+                                <div class="text-center py-5">
+                                    <span class="text-4xl font-bold text-gray-700"> [[${productDetail.name}]]</span>
+                                </div>
+                                <p class="uppercase text-stone-500 text-xl font-semibold">Category</p>
+                                <h2 class="text-xl text-gray-700 ">[[${productDetail.listProductCategories}]]</h2>
+
+                                <div class="leading-relaxed py-2">
+                                    <div class="inline-block">
+                                        <span class="font-bold text-lg text-gray-700">Description: </span><p class="text-base"   >[[${productDetail.content}]]</p>
+                                    </div>
+                                </div>
+                                <div class="leading-relaxed py-2">
+                                    <div>
+                                        <span class="font-bold text-lg text-gray-700">Price: </span>[[${productDetail.price}]]$
+                                    </div>
+                                </div>
+                                <div class="leading-relaxed py-2">
+                                    <div>
+                                        <span class="font-bold text-lg text-gray-700">Discount Price: </span>[[${productDetail.discountPrice}]]$
+                                    </div>
+                                </div>
+                                <div class="leading-relaxed py-2">
+                                    <div>
+                                        <span class="font-bold text-lg text-gray-700">Tax: </span>[[${productDetail.tax}]]%
+                                    </div>
+                                </div>
+                                <div class="leading-relaxed py-2">
+                                    <div>
+                                        <span class="font-bold text-lg text-gray-700">Product Create At: </span>[[${productDetail.createdAt}]]
+                                    </div>
+                                </div>
+                                <div class="leading-relaxed py-2">
+                                    <div>
+                                        <span class="font-bold text-lg text-gray-700">Product Update At: </span>[[${productDetail.updatedAt}]]
+                                    </div>
+                                </div>
+                                <div class="leading-relaxed py-2">
+                                    <div>
+                                        <span class="font-bold text-lg text-gray-700">Product Delete At: </span>[[${productDetail.deletedAt}]]
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <div th:replace="component/fragmen ::header"></div>
+</head>
+<body class="flex flex-col min-h-screen">
+<div style="background-color: #F2F2F2">
+
+    <div th:replace="component/fragmen ::Navbar"></div>
+
+    <form th:action="@{/cart/checkout}" method="post">
+        <div  class="bg-gray-100 h-screen ">
+            <div th:if="${listProduct.size()==0}" class="mt-20">
+                <div th:replace="component/notification::alertMessage"></div>
+                <h3 class="text-center mt-5 text-lg font-bold text-red-500 mb-4 animate-pulse">Mục Yêu thích của bạn Hiện taị đang trống<b class="text-blue-300"><a th:href="@{/main-page}">Click Here</a></b></h3>
+                <div class="flex justify-center items-center">
+                    <img alt="product-image" class="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200" th:src="@{/images/cute.png}">
+                </div>
+            </div>
+            <div th:if="${listProduct.size()!=0}" class="mb-9">
+                <div class="mt-16">
+                    <h1 class="text-7xl text-center mt-5 text-lg font-bold mb-4 "><b>Sản phẩm yêu thích</b></h1>
+                    <input type="hidden" id="message" th:value="${message}" />
+
+                </div>
+            </div>
+            <div class="container mx-auto mt-5">
+                <div th:replace="component/notification::announcement"></div>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="w-full">
+                        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                            <table class="w-full">
+                                <thead>
+                                <tr>
+                                    <th class="text-left font-semibold">Hình ảnh</th>
+                                    <th class="text-left font-semibold">Tên sản phẩm</th>
+                                    <th class="text-left font-semibold">Miêu tả sản phẩm</th>
+                                    <th class="text-left font-semibold">Xóa</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:each="product : ${listProduct}" >
+                                    <div class=" ">
+                                        <input type="hidden" name="productIds" th:value="${product.getId()}" />
+                                        <tr   class="border-b border-blue-200 hover:bg-blue-100" >
+                                            <td class="py-4" th:onclick="'window.location.href=\'/cart?productId=' + ${product.getId()} + '\''">
+                                                <div class="flex items-center">
+                                                    <img class="h-16 w-16 mr-4" th:src="${product.loadImages()}" alt="Product image">
+                                                </div>
+                                            </td>
+                                            <td class="py-4" th:onclick="'window.location.href=\'/cart?productId=' + ${product.getId()} + '\''">
+                                                <span  class="block text-lg font-medium text-gray-900">$[[${product.name}]]</span>
+                                            </td>
+                                            <td class="py-4" th:onclick="'window.location.href=\'/cart?productId=' + ${product.getId()} + '\''">
+                                                <span  class="block text-lg font-medium text-gray-900">$[[${product.content}]]</span>
+                                            </td>
+                                            <td class="py-4">
+                                                <button
+                                                        type="button"
+                                                        class="text-red-600 hover:text-red-800 font-medium"
+                                                        th:onclick="'window.location.href=\'/wishlist/delete/' + ${product.getId()} + '\''">
+                                                    Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </div>
+                                </th:block>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+<footer class="bg-gray-200 w-full">
+</footer>
+</body>
+</html>
