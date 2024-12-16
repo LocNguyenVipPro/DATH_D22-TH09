@@ -34,7 +34,7 @@ public class OrderController {
 
     @GetMapping("/order/success")
     public String messageSuccess(RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("Message", "Congratulations on your successful purchase");
+        redirectAttributes.addFlashAttribute("Message", "Chúc mừng bạn đã mua sắm thành công!!!");
         return "redirect:/main-page";
     }
 
@@ -68,7 +68,7 @@ public class OrderController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/cart/shopping-cart";
         }
-        redirectAttributes.addFlashAttribute("Message", "Congratulation! You're Buy Successfully");
+        redirectAttributes.addFlashAttribute("Message", "Chúc mừng bạn đã mua hàng thành công!");
         return "redirect:/main-page";
     }
 
@@ -125,7 +125,7 @@ public class OrderController {
         try {
             User user = this.userService.findUserById(customer.getUserId());
             this.orderService.checkOutCart(user, productIds, quantities);
-            redirectAttributes.addFlashAttribute("Message", "Congratulation! You're Buy Successfully");
+            redirectAttributes.addFlashAttribute("Message", "Chúc mừng bạn đã mua hàng thành công!");
             return "redirect:/main-page";
         } catch (ProductException | UserException ex) {
             return "redirect:/main-page";

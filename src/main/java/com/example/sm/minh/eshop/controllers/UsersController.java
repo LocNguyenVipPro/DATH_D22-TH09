@@ -72,7 +72,7 @@ public class UsersController {
         }
 
         this.userService.updateProfile(UserProfileMapper.toUserProfile(userProfileRequest), userDetails);
-        redirectAttributes.addFlashAttribute("Message", "update Profile Successfully");
+        redirectAttributes.addFlashAttribute("Message", "Cập nhật thông tin thành công!");
         return "redirect:/main-page";
     }
 
@@ -113,7 +113,7 @@ public class UsersController {
 
         if (createUserRequest.getId() != null && createUserRequest.getId() != 0) {
             userToSave = this.userService.updateUser(users);
-            redirectAttributes.addFlashAttribute("Message", "Update Information Successfully");
+            redirectAttributes.addFlashAttribute("Message", "Cập nhật thông tin người dùng thành công!");
         } else {
             userToSave = this.userService.createNewUser(users);
             redirectAttributes.addFlashAttribute("Message", "Đăng ký tài khoản thành công!");
