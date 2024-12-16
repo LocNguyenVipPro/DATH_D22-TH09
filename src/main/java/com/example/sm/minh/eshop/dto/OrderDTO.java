@@ -1,18 +1,14 @@
 package com.example.sm.minh.eshop.dto;
 
+import jakarta.persistence.*;
+
 import com.example.sm.minh.eshop.models.Order;
 import com.example.sm.minh.eshop.models.Product;
-import com.example.sm.minh.eshop.models.User;
-import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.util.Date;
 
 public class OrderDTO {
     private Integer id;
 
-    private Integer quantity ;
+    private Integer quantity;
 
     private Float totalAmount;
 
@@ -23,7 +19,14 @@ public class OrderDTO {
     private Product productId;
     private Order orderId;
 
-    public OrderDTO(Integer id, Integer quantity, Float totalAmount, Float subTotalAmount, Float taxTotalAmount, Product productId, Order orderId) {
+    public OrderDTO(
+            Integer id,
+            Integer quantity,
+            Float totalAmount,
+            Float subTotalAmount,
+            Float taxTotalAmount,
+            Product productId,
+            Order orderId) {
         this.id = id;
         this.quantity = quantity;
         this.totalAmount = totalAmount;

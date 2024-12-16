@@ -1,39 +1,42 @@
 package com.example.sm.minh.eshop.services;
 
-import com.example.sm.minh.eshop.models.Role;
-import com.example.sm.minh.eshop.models.UserProfile;
-import com.example.sm.minh.eshop.models.User;
-import com.example.sm.minh.eshop.exceptions.UserException;
-import com.example.sm.minh.eshop.mappers.UserProfileMapper;
-import com.example.sm.minh.eshop.repositories.UserProfileRepository;
-import com.example.sm.minh.eshop.repositories.UserRepository;
-import com.example.sm.minh.eshop.repositories.RoleRepository;
-import com.example.sm.minh.eshop.requests.UserProfileRequest;
+import java.util.Date;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import java.util.Date;
-import java.util.Optional;
+import com.example.sm.minh.eshop.exceptions.UserException;
+import com.example.sm.minh.eshop.mappers.UserProfileMapper;
+import com.example.sm.minh.eshop.models.Role;
+import com.example.sm.minh.eshop.models.User;
+import com.example.sm.minh.eshop.models.UserProfile;
+import com.example.sm.minh.eshop.repositories.RoleRepository;
+import com.example.sm.minh.eshop.repositories.UserProfileRepository;
+import com.example.sm.minh.eshop.repositories.UserRepository;
+import com.example.sm.minh.eshop.requests.UserProfileRequest;
 
 @Service
 public class UserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private RoleRepository rolesRepository;
+
     @Autowired
     private UserProfileRepository userProfileRepository;
-
 
     public boolean checkUserNameUni(String userName, Integer id) {
         User user = this.userRepository.findUsersByUserName(userName);
 
-        if (id==null||id == 0 ) {
+        if (id == null || id == 0) {
             if (user != null) {
                 return false;
             }
@@ -46,15 +49,14 @@ public class UserService {
         return true;
     }
 
-
-    public User findUserByUserName(String userName)
-    {
+    public User findUserByUserName(String userName) {
         return this.userRepository.findUsersByUserName(userName);
     }
 
-    public User save(User users) {
-        Role defaultRole = rolesRepository.findById(1).orElseGet(() -> createDefaultRole(1));
-        users.addRoles(defaultRole);
+    public User save(User users, Role role) {
+        if (role != null) {
+            users.setRole(role);
+        }
 
         if (users.getId() != null) {
             users.setUpdatedAt(new Date());
@@ -65,39 +67,15 @@ public class UserService {
         return this.userRepository.save(users);
     }
 
-    private Role createDefaultRole(int roleId) {
-        String roleName;
-        String roleDescription;
-
-        if (roleId == 1) {
-            roleName = "Admin";
-            roleDescription = "Do Anything";
-        } else if (roleId == 2) {
-            roleName = "User";
-            roleDescription = "User role is for those who engage in buying and selling goods";
-        } else {
-            roleName = "Unknown Role";
-            roleDescription = "Unknown description";
-        }
-
-        Role defaultRole = new Role(roleName, roleDescription);
-        defaultRole.setId(roleId);
-        return this.rolesRepository.save(defaultRole);
-    }
-
-
-
-    public void saveUserProfile(UserProfile userProfile)
-    {
+    public void saveUserProfile(UserProfile userProfile) {
         this.userProfileRepository.save(userProfile);
     }
 
     public User findUserById(int id) throws UserException {
         try {
             return this.userRepository.findById(id).get();
-        }catch (Exception ex)
-        {
-            throw new UserException("Cannot Find User With Id : "+id);
+        } catch (Exception ex) {
+            throw new UserException("Cannot Find User With Id : " + id);
         }
     }
 
@@ -117,7 +95,7 @@ public class UserService {
 
     public User updateUser(User editUser) throws UserException {
         User user = this.findUserById(editUser.getId());
-        user.setActive(editUser.getActive());
+        user.setIsActive(editUser.getIsActive());
         user.setUpdatedAt(new Date());
         user.setFirstName(editUser.getFirstName());
         user.setLastName(editUser.getLastName());
@@ -136,7 +114,8 @@ public class UserService {
             userProfile.setCreatedAt(new Date());
             this.saveUserProfile(userProfile);
         } else {
-            UserProfile userProfileInData = this.getUserProfileById(userProfile.getId()).orElse(null);
+            UserProfile userProfileInData =
+                    this.getUserProfileById(userProfile.getId()).orElse(null);
             if (userProfileInData != null) {
                 userProfileInData.setUpdatedAt(new Date());
                 userProfileInData.setGender(userProfile.isGender());
@@ -146,7 +125,6 @@ public class UserService {
                 this.saveUserProfile(userProfileInData);
             }
         }
-
     }
 
     public void prepareFormModel(Model model, String pageTitle, boolean isNewUser) {
@@ -155,14 +133,14 @@ public class UserService {
         model.addAttribute("titleForm", pageTitle);
         model.addAttribute("isNewUser", isNewUser);
     }
-    public void setUpToUpdateForm(Model model,UserProfile userProfile)
-    {
+
+    public void setUpToUpdateForm(Model model, UserProfile userProfile) {
         model.addAttribute("pageTitle", "Update User");
         model.addAttribute("titleForm", "Cập nhật thông tin cá nhân");
 
         if (userProfile == null) {
             model.addAttribute("isCheckGenderChoose", false);
-            model.addAttribute("userProfileRequest",new UserProfileRequest());
+            model.addAttribute("userProfileRequest", new UserProfileRequest());
         } else {
             model.addAttribute("isCheckGenderChoose", true);
             model.addAttribute("userProfileRequest", UserProfileMapper.toUserProfileRequest(userProfile));

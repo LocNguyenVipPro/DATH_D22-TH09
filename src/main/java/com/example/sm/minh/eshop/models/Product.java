@@ -1,15 +1,16 @@
 package com.example.sm.minh.eshop.models;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.*;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -19,19 +20,17 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "name", length = 100, unique = true)
+    private String name;
 
-    @Column(name = "name",length = 100,unique = true)
-    private String name ;
-
-
-    @Column(name = "sku",length = 15,unique = true)
-    private String sku ;
+    @Column(name = "sku", length = 15, unique = true)
+    private String sku;
 
     @Column(name = "content")
     @Lob
-    private String content ;
+    private String content;
 
-    @Column(name = "image",length = 255)
+    @Column(name = "image", length = 255)
     private String image;
 
     @Column(name = "price")
@@ -62,9 +61,8 @@ public class Product {
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "products_categories",
-            joinColumns = { @JoinColumn(name = "product_categories_id") },
-            inverseJoinColumns = { @JoinColumn(name = "product_id") }
-    )
+            joinColumns = {@JoinColumn(name = "product_categories_id")},
+            inverseJoinColumns = {@JoinColumn(name = "product_id")})
     private Set<ProductCategory> ListProductCategories = new HashSet<>();
 
     public Set<ProductCategory> getListProductCategories() {
@@ -75,33 +73,29 @@ public class Product {
         ListProductCategories = listProductCategories;
     }
 
-    public String loadImages()
-    {
-        if(this.image==null||this.image.isEmpty())
-        {
+    public String loadImages() {
+        if (this.image == null || this.image.isEmpty()) {
             return "/images/products/img.png";
-        }else
-        {
-            return "/images/products/"+this.id+"/"+this.image;
+        } else {
+            return "/images/products/" + this.id + "/" + this.image;
         }
     }
 
     @Override
     public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", Sku='" + sku + '\'' +
-                ", Content='" + content + '\'' +
-                ", image='" + image + '\'' +
-                ", price=" + price +
-                ", discount_price=" + discountPrice +
-                ", tax=" + tax +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", deletedAt=" + deletedAt +
-                ", isActive=" + isActive +
-                '}';
+        return "Product{" + "id="
+                + id + ", name='"
+                + name + '\'' + ", Sku='"
+                + sku + '\'' + ", Content='"
+                + content + '\'' + ", image='"
+                + image + '\'' + ", price="
+                + price + ", discount_price="
+                + discountPrice + ", tax="
+                + tax + ", createdAt="
+                + createdAt + ", updatedAt="
+                + updatedAt + ", deletedAt="
+                + deletedAt + ", isActive="
+                + isActive + '}';
     }
 
     public Product(String name, String sku, String content, float price, float discount_price, float tax) {
@@ -111,18 +105,16 @@ public class Product {
         this.price = price;
         this.discountPrice = discount_price;
         this.tax = tax;
-        this.createdAt=new Date();
-    }
-    public void addProductCate(ProductCategory productCategories)
-    {
-        this.ListProductCategories.add(productCategories);
+        this.createdAt = new Date();
     }
 
+    public void addProductCate(ProductCategory productCategories) {
+        this.ListProductCategories.add(productCategories);
+    }
 
     public void setContent(String content) {
         this.content = content;
     }
 
-    public Product() {
-    }
+    public Product() {}
 }

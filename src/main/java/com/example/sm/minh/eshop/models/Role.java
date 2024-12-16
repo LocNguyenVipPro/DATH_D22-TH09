@@ -1,36 +1,35 @@
 package com.example.sm.minh.eshop.models;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity(name = "Roles")
 @Getter
 @Setter
 @AllArgsConstructor
-@Entity(name = "roles")
 public class Role {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 45,nullable = false,unique = true)
+    @Column(length = 45, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "descripton")
+    @Column(name = "description")
     private String des;
 
-    @ManyToMany(mappedBy = "listRoles",fetch = FetchType.EAGER)
-    private Set<User> list_User=new HashSet<>();
+    public Role() {}
 
     public Role(String name, String des) {
         this.name = name;
         this.des = des;
     }
 
-
-    public Role() {
+    @Override
+    public String toString() {
+        return "Role{" + "id=" + id + ", name='" + name + '\'' + ", description='" + des + '\'' + '}';
     }
 }

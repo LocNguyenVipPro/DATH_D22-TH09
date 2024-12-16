@@ -1,13 +1,14 @@
 package com.example.sm.minh.eshop.services;
 
-import com.example.sm.minh.eshop.models.WishList;
-import com.example.sm.minh.eshop.repositories.WishListRepository;
-import com.example.sm.minh.eshop.securities.ShopMeUserDetail;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.example.sm.minh.eshop.models.WishList;
+import com.example.sm.minh.eshop.repositories.WishListRepository;
+import com.example.sm.minh.eshop.securities.ShopMeUserDetail;
 
 @Service
 public class WishListService {
@@ -28,8 +29,10 @@ public class WishListService {
             throw new IllegalArgumentException("WishList với id " + wishList.getId() + " không tồn tại");
         }
     }
-    public WishList remove(ShopMeUserDetail customer,int id ) {
-        Optional<WishList> wishListOptional = Optional.ofNullable(this.wishListRepository.findByUserIdAndProductId(customer.getUserId(), id));
+
+    public WishList remove(ShopMeUserDetail customer, int id) {
+        Optional<WishList> wishListOptional =
+                Optional.ofNullable(this.wishListRepository.findByUserIdAndProductId(customer.getUserId(), id));
         wishListOptional.ifPresent(list -> this.wishListRepository.delete(list));
         return wishListOptional.orElse(null);
     }

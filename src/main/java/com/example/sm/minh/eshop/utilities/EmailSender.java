@@ -1,7 +1,9 @@
 package com.example.sm.minh.eshop.utilities;
+
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+
 public class EmailSender {
 
     public static void sendEmail(String from, String password, String to, String subject, String content) {
@@ -11,7 +13,6 @@ public class EmailSender {
         properties.put("mail.smtp.port", "587");
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-
 
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override

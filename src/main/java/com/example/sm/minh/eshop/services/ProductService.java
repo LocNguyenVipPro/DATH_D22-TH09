@@ -1,22 +1,22 @@
 package com.example.sm.minh.eshop.services;
 
-import com.example.sm.minh.eshop.dto.ProductDTO;
-import com.example.sm.minh.eshop.models.*;
-import com.example.sm.minh.eshop.exceptions.CategoryProductException;
-import com.example.sm.minh.eshop.exceptions.ProductException;
-import com.example.sm.minh.eshop.repositories.*;
-import com.example.sm.minh.eshop.utilities.FileUploadUltil;
+import java.io.IOException;
+import java.util.*;
+
 import jakarta.validation.ConstraintValidatorContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
-
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.*;
+import com.example.sm.minh.eshop.dto.ProductDTO;
+import com.example.sm.minh.eshop.exceptions.CategoryProductException;
+import com.example.sm.minh.eshop.exceptions.ProductException;
+import com.example.sm.minh.eshop.models.*;
+import com.example.sm.minh.eshop.repositories.*;
+import com.example.sm.minh.eshop.utilities.FileUploadUltil;
 
 @Service
 public class ProductService {
@@ -37,10 +37,9 @@ public class ProductService {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
 
-
     public List<ProductDTO> findAll(Integer categoryId, String search, Boolean isHide) {
-        if(search==null||search.trim().isEmpty()) search=null;
-        List<ProductDTO>list=new ArrayList<>();
+        if (search == null || search.trim().isEmpty()) search = null;
+        List<ProductDTO> list = new ArrayList<>();
 
         if (categoryId != null && search != null) {
 
@@ -64,7 +63,8 @@ public class ProductService {
 
     public ProductCategory getCategoryById(Integer id) throws CategoryProductException {
         Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(id);
-        return optionalProductCategory.orElseThrow(() -> new CategoryProductException("Cannot Find Category With ID :" + id));
+        return optionalProductCategory.orElseThrow(
+                () -> new CategoryProductException("Cannot Find Category With ID :" + id));
     }
 
     public Product save(Product product) {
@@ -81,7 +81,6 @@ public class ProductService {
         deleteProduct.setDeletedAt(new Date());
         deleteProduct.setIsActive(false);
         this.producsRepository.save(deleteProduct);
-
     }
 
     // Method to delete cart items related to a product
@@ -101,7 +100,6 @@ public class ProductService {
         }
     }
 
-
     // Method to update cart information after deleting a cart item related to a product
     private void updateCartInfo(Cart cart, CartLineItem cartLineItem) {
         cart.setTaxAmount(cart.getTaxAmount() - cartLineItem.getTaxTotalAmount());
@@ -118,7 +116,8 @@ public class ProductService {
             Product product = productOption.get();
             for (ProductCategory productCategory : product.getListProductCategories()) {
                 if (!productCategory.getIsActive()) {
-                    throw new ProductException("Cannot restore " + productCategory.getName() + " because it does not exist");
+                    throw new ProductException(
+                            "Cannot restore " + productCategory.getName() + " because it does not exist");
                 }
             }
 
@@ -129,7 +128,6 @@ public class ProductService {
             throw new ProductException("Cannot find product with ID: " + id);
         }
     }
-
 
     public void updateCartAndCAndCartLineItem(Product product) {
 
@@ -144,14 +142,12 @@ public class ProductService {
             this.cartReposttory.save(updateCart);
             this.cartLineItemRepositoty.delete(cartLineItem);
         }
-
     }
 
     public Product findById(Integer id) throws ProductException {
         Optional<Product> productOption = this.producsRepository.findById(id);
         return productOption.orElseThrow(() -> new ProductException("Cannot Found Products With Id : " + id));
     }
-
 
     public ArrayList<ProductDTO> productOrderMost() {
         Pageable pageable = PageRequest.of(0, INT_PAGE_SIZE);
@@ -164,12 +160,10 @@ public class ProductService {
             Long quantityPurchase = (Long) obj[1];
             ProductDTO productDTO = new ProductDTO(product, quantityPurchase);
             productDTOS.add(productDTO);
-
         }
 
         return productDTOS;
     }
-
 
     public Product setDataProduct(Product product, Product productInForm) throws IOException {
         product.setUpdatedAt(new Date());
@@ -186,9 +180,9 @@ public class ProductService {
 
     public Product saveImage(Product product, MultipartFile multipartFile) throws IOException {
 
-        if (multipartFile!=null&&!multipartFile.isEmpty()) {
+        if (multipartFile != null && !multipartFile.isEmpty()) {
             String fileName = multipartFile.getOriginalFilename();
-            fileName=fileName.replace(' ','_');
+            fileName = fileName.replace(' ', '_');
             product.setImage(fileName);
             this.save(product);
             String directory = "public/images/products/" + product.getId();
@@ -208,30 +202,35 @@ public class ProductService {
             productInDb = this.saveImage(productInDb, multipartFile);
             this.saveImage(productInDb, multipartFile);
         } else {
-            product=trimProduct(product);
+            product = trimProduct(product);
             product.setCreatedAt(new Date());
             this.saveImage(product, multipartFile);
         }
     }
 
-    public Product trimProduct(Product product)
-    {
+    public Product trimProduct(Product product) {
         product.setName(product.getName().trim());
         product.setContent(product.getContent().trim());
         product.setSku(product.getSku().trim());
         return product;
     }
 
-    public boolean checkNameAndSkuUnique(String name, String sku, Integer id, String nameField, String skuField, ConstraintValidatorContext context) {
+    public boolean checkNameAndSkuUnique(
+            String name,
+            String sku,
+            Integer id,
+            String nameField,
+            String skuField,
+            ConstraintValidatorContext context) {
         String nameErrorMessage = null;
         String skuErrorMessage = null;
 
         if (id == null || id == 0) {
-            if (producsRepository.findProductByName(name)!=null) {
-                nameErrorMessage = "Product with name "+name+" already exists";
+            if (producsRepository.findProductByName(name) != null) {
+                nameErrorMessage = "Product with name " + name + " already exists";
             }
-            if (producsRepository.findProductBySku(sku)!=null) {
-                skuErrorMessage = "Product with SKU "+sku+" already exists";
+            if (producsRepository.findProductBySku(sku) != null) {
+                skuErrorMessage = "Product with SKU " + sku + " already exists";
             }
         } else {
             Product existingProduct = producsRepository.findById(id).orElse(null);
@@ -268,7 +267,7 @@ public class ProductService {
         return nameErrorMessage == null && skuErrorMessage == null;
     }
 
-    //format sale product
+    // format sale product
     public String formatQuantity(long quantity) {
         if (quantity >= 1000000) {
             double result = quantity / 1000000.0;
@@ -281,9 +280,11 @@ public class ProductService {
         }
     }
 
-
     public int calculateRoundedPercent(ProductDTO productDTO) {
-        double discountPercent = ((productDTO.getProduct().getPrice() - productDTO.getProduct().getDiscountPrice()) / productDTO.getProduct().getPrice()) * 100;
+        double discountPercent =
+                ((productDTO.getProduct().getPrice() - productDTO.getProduct().getDiscountPrice())
+                                / productDTO.getProduct().getPrice())
+                        * 100;
         int roundedPercent = (int) Math.round(discountPercent);
         double decimalPart = discountPercent - roundedPercent;
         if (decimalPart >= 0.5) {
@@ -291,7 +292,8 @@ public class ProductService {
         }
         return roundedPercent;
     }
-    public ArrayList<ProductDTO> toProductDTO(List<Object[]>objectListProductDTO) {
+
+    public ArrayList<ProductDTO> toProductDTO(List<Object[]> objectListProductDTO) {
 
         ArrayList<ProductDTO> productDTOS = new ArrayList<>();
         for (Object[] obj : objectListProductDTO) {
@@ -299,113 +301,95 @@ public class ProductService {
             Long quantityPurchase = (Long) obj[1];
             ProductDTO productDTO = new ProductDTO(product, quantityPurchase);
             productDTOS.add(productDTO);
-
         }
 
         return productDTOS;
     }
 
-        public int[] getRangePrice(String rangePrice)
-        {
-            int[] pair = new int[2];
+    public int[] getRangePrice(String rangePrice) {
+        int[] pair = new int[2];
 
-            if(rangePrice.equals("0-1k"))
-            {
-                pair[0] = 0;
-                pair[1] = 1000;
+        if (rangePrice.equals("0-1k")) {
+            pair[0] = 0;
+            pair[1] = 1000;
 
-            }else if(rangePrice.equals("1k-2k"))
-            {
-                pair[0] = 1000;
-                pair[1] = 2000;
-            }else if(rangePrice.equals("2k-3k"))
-            {
-                pair[0] = 2000;
-                pair[1] = 3000;
-            }else if(rangePrice.equals("3k-4k"))
-            {
-                pair[0] = 3000;
-                pair[1] = 4000;
-            }else
-            {
-                pair[0] = 4000;
-                pair[1] = 500000;
-            }
-
-            return pair;
+        } else if (rangePrice.equals("1k-2k")) {
+            pair[0] = 1000;
+            pair[1] = 2000;
+        } else if (rangePrice.equals("2k-3k")) {
+            pair[0] = 2000;
+            pair[1] = 3000;
+        } else if (rangePrice.equals("3k-4k")) {
+            pair[0] = 3000;
+            pair[1] = 4000;
+        } else {
+            pair[0] = 4000;
+            pair[1] = 500000;
         }
 
-        public int[] getRangePercent(String rangeSalePercent)
-        {
-            int[] pair = new int[2];
+        return pair;
+    }
 
-            if(rangeSalePercent.equals("0%-20%"))
-            {
-                pair[0] = 0;
-                pair[1] = 20;
+    public int[] getRangePercent(String rangeSalePercent) {
+        int[] pair = new int[2];
 
-            }else if(rangeSalePercent.equals("20%-40%"))
-            {
-                pair[0] = 20;
-                pair[1] = 40;
-            }else if(rangeSalePercent.equals("40%-60%"))
-            {
-                pair[0] = 40;
-                pair[1] = 60;
-            }else if(rangeSalePercent.equals("60%-80%"))
-            {
-                pair[0] = 60;
-                pair[1] = 80;
-            }else
-            {
-                pair[0] = 80;
-                pair[1] = 100;
-            }
+        if (rangeSalePercent.equals("0%-20%")) {
+            pair[0] = 0;
+            pair[1] = 20;
 
-            return pair;
+        } else if (rangeSalePercent.equals("20%-40%")) {
+            pair[0] = 20;
+            pair[1] = 40;
+        } else if (rangeSalePercent.equals("40%-60%")) {
+            pair[0] = 40;
+            pair[1] = 60;
+        } else if (rangeSalePercent.equals("60%-80%")) {
+            pair[0] = 60;
+            pair[1] = 80;
+        } else {
+            pair[0] = 80;
+            pair[1] = 100;
         }
+
+        return pair;
+    }
+
     public List<ProductDTO> findByPrice(String rangePrice, String rangeSalePercent, String categoryId) {
         List<ProductDTO> productDTOArrayList = new ArrayList<>();
         int[] priceRange = null;
         int[] saleRange = null;
-        Integer categorySelected=null;
+        Integer categorySelected = null;
 
-        if(categoryId!=null)
-        {
-            categorySelected=Integer.parseInt(categoryId);
+        if (categoryId != null) {
+            categorySelected = Integer.parseInt(categoryId);
         }
 
         if (rangeSalePercent != null) {
-            saleRange=getRangePercent(rangeSalePercent);
+            saleRange = getRangePercent(rangeSalePercent);
         }
 
         if (rangePrice != null) {
-            priceRange=getRangePrice(rangePrice);
+            priceRange = getRangePrice(rangePrice);
         }
 
-        Integer saleRangeMin=null;
-        Integer saleRangeMax=null;
+        Integer saleRangeMin = null;
+        Integer saleRangeMax = null;
 
-        if(saleRange != null)
-        {
-            saleRangeMin=saleRange[0];
-            saleRangeMax=saleRange[1];
+        if (saleRange != null) {
+            saleRangeMin = saleRange[0];
+            saleRangeMax = saleRange[1];
         }
 
-        Integer priceRangeMin=null;
-        Integer priceRangeMax=null;
+        Integer priceRangeMin = null;
+        Integer priceRangeMax = null;
 
-        if(priceRange != null)
-        {
-            priceRangeMin=priceRange[0];
-            priceRangeMax=priceRange[1];
+        if (priceRange != null) {
+            priceRangeMin = priceRange[0];
+            priceRangeMax = priceRange[1];
         }
 
-        productDTOArrayList = toProductDTO(this.producsRepository.findByPriceSalePercentAndCategory(priceRangeMin, priceRangeMax, saleRangeMin, saleRangeMax,categorySelected));
+        productDTOArrayList = toProductDTO(this.producsRepository.findByPriceSalePercentAndCategory(
+                priceRangeMin, priceRangeMax, saleRangeMin, saleRangeMax, categorySelected));
         return productDTOArrayList;
     }
-
-
-
-
 }

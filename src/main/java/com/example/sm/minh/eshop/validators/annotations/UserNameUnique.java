@@ -1,10 +1,11 @@
 package com.example.sm.minh.eshop.validators.annotations;
 
-import com.example.sm.minh.eshop.validators.constraints.UniqueEmailConstraint;
+import java.lang.annotation.*;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.*;
+import com.example.sm.minh.eshop.validators.constraints.UniqueEmailConstraint;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -12,11 +13,12 @@ import java.lang.annotation.*;
 @Documented
 public @interface UserNameUnique {
     String message() default "";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
-    String idField()default "";
-    String emailField()default "";
+    String idField() default "";
+
+    String emailField() default "";
 }
-
-

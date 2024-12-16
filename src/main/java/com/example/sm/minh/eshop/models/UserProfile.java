@@ -1,13 +1,15 @@
 package com.example.sm.minh.eshop.models;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -17,16 +19,14 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
     @Column(name = "phone_number", length = 15, nullable = false)
     private String phoneNumber;
 
-
-    @Column(name = "bio", columnDefinition = "TEXT",nullable = false)
+    @Column(name = "bio", columnDefinition = "TEXT", nullable = false)
     private String bio;
 
     @NotNull
-    @Column(name = "addresss",nullable = false)
+    @Column(name = "addresss", nullable = false)
     private String address;
 
     private boolean gender;
@@ -51,23 +51,21 @@ public class UserProfile {
         this.address = address;
         this.gender = gender;
         this.users = users;
-        this.createdAt=new Date();
+        this.createdAt = new Date();
     }
 
     @Override
     public String toString() {
-        return "UserProfile{" +
-                "id=" + id +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", bio='" + bio + '\'' +
-                ", address='" + address + '\'' +
-                ", gender=" + gender +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", users=" + users +
-                '}';
+        return "UserProfile{" + "id="
+                + id + ", phoneNumber='"
+                + phoneNumber + '\'' + ", bio='"
+                + bio + '\'' + ", address='"
+                + address + '\'' + ", gender="
+                + gender + ", createdAt="
+                + createdAt + ", updatedAt="
+                + updatedAt + ", users="
+                + users + '}';
     }
 
-    public UserProfile() {
-    }
+    public UserProfile() {}
 }

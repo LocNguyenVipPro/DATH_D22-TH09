@@ -16,9 +16,17 @@
     <input name="isChoiceCategory" type="hidden"/>
     <div class="mt-10 bg-white container mx-auto flex items-center flex-wrap pt-4"
          th:if="${productsOrderedMost != null and productsOrderedMost.size()!=0}">
-        <div class="ml-14  justify-center">
-            <p class="px-4 h-16 text-5xl flex items-center  uppercase font-serif text-blue-700">Sản phẩm bán chạy nhất</p>
+        <div class="ml-14 flex justify-center items-center bg-gray-100 p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
+            <div class="p-3 bg-yellow-500 text-white rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 15l-3.5 2.2 1-4.2-3-2.8 4.3-.4L10 6l1.7 4.3 4.3.4-3 2.8 1 4.2L10 15z" />
+                </svg>
+            </div>
+            <p class="ml-4 text-4xl font-serif text-gray-800 uppercase tracking-wide">
+                Sản phẩm bán chạy nhất
+            </p>
         </div>
+
         <div class="w-full mt-5">
             <div class="pagination-buttons flex justify-between items-center">
                 <button class="bg-zinc-50  p-1" id="previous-btn">

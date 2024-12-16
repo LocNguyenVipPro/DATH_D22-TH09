@@ -1,14 +1,14 @@
 package com.example.sm.minh.eshop.services;
 
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.example.sm.minh.eshop.exceptions.TokenException;
 import com.example.sm.minh.eshop.models.Token;
 import com.example.sm.minh.eshop.models.User;
 import com.example.sm.minh.eshop.repositories.TokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 // Service class to handle token-related operations
 @Service
@@ -31,15 +31,12 @@ public class TokenService {
     }
 
     public void deleteToken(User user) {
-        Token token=tokenRepository.findByUser(user);
+        Token token = tokenRepository.findByUser(user);
 
-        if(token!=null)
-        {
+        if (token != null) {
             this.tokenRepository.delete(token);
         }
     }
-
-
 
     public Token getTokenByUser(User verifiedUser) throws TokenException {
         Token verificationToken = tokenRepository.findByUser(verifiedUser);
@@ -50,5 +47,4 @@ public class TokenService {
 
         throw new TokenException("Token not found for user");
     }
-
 }

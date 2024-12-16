@@ -1,13 +1,15 @@
 package com.example.sm.minh.eshop.models;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -18,7 +20,7 @@ public class OrderLineItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer quantity ;
+    private Integer quantity;
 
     private Float totalAmount;
 
@@ -42,15 +44,14 @@ public class OrderLineItem {
 
     @Override
     public String toString() {
-        return "OrderLineItem{" +
-                "id=" + id +
-                ", quantity=" + quantity +
-                ", totalAmount=" + totalAmount +
-                ", subTotalAmount=" + subTotalAmount +
-                ", taxTotalAmount=" + taxTotalAmount +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "OrderLineItem{" + "id="
+                + id + ", quantity="
+                + quantity + ", totalAmount="
+                + totalAmount + ", subTotalAmount="
+                + subTotalAmount + ", taxTotalAmount="
+                + taxTotalAmount + ", createdAt="
+                + createdAt + ", updatedAt="
+                + updatedAt + '}';
     }
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -59,10 +60,10 @@ public class OrderLineItem {
 
     public OrderLineItem() {
 
-        this.quantity=0;
-        this.totalAmount=0f;
-        this.subTotalAmount=0f;
-        this.taxTotalAmount=0f;
-        this.createdAt=new Date();
+        this.quantity = 0;
+        this.totalAmount = 0f;
+        this.subTotalAmount = 0f;
+        this.taxTotalAmount = 0f;
+        this.createdAt = new Date();
     }
 }

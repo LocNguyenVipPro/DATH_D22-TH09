@@ -10,7 +10,7 @@ public class UserMapper {
         user.setPassword(userRequest.getPassword());
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
-        user.setActive(userRequest.getIsActive());
+        user.setIsActive(userRequest.getIsActive());
         user.setId(userRequest.getId());
         return user;
     }

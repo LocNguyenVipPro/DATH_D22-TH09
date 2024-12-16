@@ -1,14 +1,14 @@
 package com.example.sm.minh.eshop;
 
-import com.example.sm.minh.eshop.utilities.EmailSender;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.example.sm.minh.eshop.utilities.EmailSender;
 
 @SpringBootTest
 public class SendEmailTest {
     @Test
-    public void sendEmail()
-    {
+    public void sendEmail() {
         // Thông tin tài khoản email
         String from = "dh52201052@student.stu.edu.vn";
         String password = "@Minh1182004";
@@ -21,6 +21,6 @@ public class SendEmailTest {
         String content = "This is a test email sent from Java.";
 
         // Gọi phương thức để gửi email
-        EmailSender.sendEmail(from,password,to,subject,content);
+        EmailSender.sendEmail(from, password, to, subject, content);
     }
 }

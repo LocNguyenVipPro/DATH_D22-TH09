@@ -1,23 +1,25 @@
 package com.example.sm.minh.eshop.services;
 
-import com.example.sm.minh.eshop.models.Product;
-import com.example.sm.minh.eshop.models.ProductCategory;
-import com.example.sm.minh.eshop.exceptions.ProductCategoryException;
-import com.example.sm.minh.eshop.exceptions.ProductException;
-import com.example.sm.minh.eshop.repositories.ProductCategoryRepository;
-import com.example.sm.minh.eshop.repositories.ProductRepository;
-import com.example.sm.minh.eshop.utilities.FileUploadUltil;
-import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintValidatorContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.sm.minh.eshop.exceptions.ProductCategoryException;
+import com.example.sm.minh.eshop.exceptions.ProductException;
+import com.example.sm.minh.eshop.models.Product;
+import com.example.sm.minh.eshop.models.ProductCategory;
+import com.example.sm.minh.eshop.repositories.ProductCategoryRepository;
+import com.example.sm.minh.eshop.repositories.ProductRepository;
+import com.example.sm.minh.eshop.utilities.FileUploadUltil;
 
 @Service
 public class ProductCategoryService {
@@ -31,10 +33,10 @@ public class ProductCategoryService {
     @Autowired
     private ProductService productService;
 
-    public List<ProductCategory> findAll(String searchValue,Boolean isHide) {
+    public List<ProductCategory> findAll(String searchValue, Boolean isHide) {
 
-        if(searchValue != null && !searchValue.trim().isEmpty()) {
-            return productCategoryRepository.findByNameContaining(searchValue,isHide);
+        if (searchValue != null && !searchValue.trim().isEmpty()) {
+            return productCategoryRepository.findByNameContaining(searchValue, isHide);
         }
 
         return productCategoryRepository.findAll(isHide);
@@ -52,18 +54,20 @@ public class ProductCategoryService {
         return productCategory;
     }
 
-    public void saveCategory(ProductCategory productCategory, MultipartFile multipartFile) throws IOException, ProductCategoryException {
+    public void saveCategory(ProductCategory productCategory, MultipartFile multipartFile)
+            throws IOException, ProductCategoryException {
 
         if (productCategory.getId() == null || productCategory.getId().equals(0)) {
             productCategory = trimCategory(productCategory);
             productCategory.setCreatedAt(new Date());
-            productCategory=this.saveImage(productCategory, multipartFile);
+            productCategory = this.saveImage(productCategory, multipartFile);
         } else {
-            ProductCategory existingCategory = this.productCategoryRepository.findById(productCategory.getId())
+            ProductCategory existingCategory = this.productCategoryRepository
+                    .findById(productCategory.getId())
                     .orElseThrow(() -> new ProductCategoryException("Category not found."));
 
             existingCategory = this.setDataForProductCategory(existingCategory, productCategory);
-            productCategory=this.saveImage(existingCategory, multipartFile);
+            productCategory = this.saveImage(existingCategory, multipartFile);
         }
         this.productCategoryRepository.save(productCategory);
     }
@@ -78,12 +82,12 @@ public class ProductCategoryService {
     @Transactional
     public void deleteCategory(Integer categoryId) throws ProductCategoryException, ProductException {
         Optional<ProductCategory> categoryOptional = this.productCategoryRepository.findById(categoryId);
-        ProductCategory deleteCategory=categoryOptional.orElseThrow(()->new ProductCategoryException("Category with ID " + categoryId + " not found"));
-        //unlink category from product
-        List<Product>listProducts =this.productRepository.findAll(categoryId,true);
+        ProductCategory deleteCategory = categoryOptional.orElseThrow(
+                () -> new ProductCategoryException("Category with ID " + categoryId + " not found"));
+        // unlink category from product
+        List<Product> listProducts = this.productRepository.findAll(categoryId, true);
 
-        for(Product product: listProducts)
-        {
+        for (Product product : listProducts) {
             productService.delete(product.getId());
         }
 
@@ -93,22 +97,22 @@ public class ProductCategoryService {
     }
 
     public ProductCategory findById(Integer id, Boolean isHide) throws ProductCategoryException {
-        Optional<ProductCategory> categoryOptional=null;
+        Optional<ProductCategory> categoryOptional = null;
 
-        //check if category is deleted or no
-        if(isHide==null)
-        {
+        // check if category is deleted or no
+        if (isHide == null) {
             categoryOptional = this.productCategoryRepository.findById(id);
-        }else
-        {
-            categoryOptional = this.productCategoryRepository.findById(id,isHide);
+        } else {
+            categoryOptional = this.productCategoryRepository.findById(id, isHide);
         }
 
-        return categoryOptional.orElseThrow(()->new ProductCategoryException("Category with ID " + id + " not found"));
+        return categoryOptional.orElseThrow(
+                () -> new ProductCategoryException("Category with ID " + id + " not found"));
     }
 
-
-    public boolean checkNameAndSlugUnique(Integer id, String name, String slug, Field nameField, Field slugField, ConstraintValidatorContext  context) throws ProductCategoryException {
+    public boolean checkNameAndSlugUnique(
+            Integer id, String name, String slug, Field nameField, Field slugField, ConstraintValidatorContext context)
+            throws ProductCategoryException {
         String nameErrorMessage = null;
         String slugErrorMessage = null;
 
@@ -116,13 +120,13 @@ public class ProductCategoryService {
         if (id == null || id == 0) {
             if (this.productCategoryRepository.findByName(name) != null) {
                 nameErrorMessage = "Category already exists with the provided name";
-            }else if (this.productCategoryRepository.findBySlug(slug) != null)
-            {
+            } else if (this.productCategoryRepository.findBySlug(slug) != null) {
                 slugErrorMessage = "Category already exists with the provided slug";
             }
         } else {
 
-            // If the id exists, check if the name or slug already exists in the database (excluding the current category)
+            // If the id exists, check if the name or slug already exists in the database (excluding the current
+            // category)
             ProductCategory existingCategoryByName = this.productCategoryRepository.findByName(name);
             ProductCategory existingCategoryBySlug = this.productCategoryRepository.findBySlug(slug);
             Optional<ProductCategory> currentCategory = this.productCategoryRepository.findById(id);
@@ -133,12 +137,14 @@ public class ProductCategoryService {
             }
 
             // Check if the name already exists
-            if (existingCategoryByName != null && !existingCategoryByName.getId().equals(id)) {
+            if (existingCategoryByName != null
+                    && !existingCategoryByName.getId().equals(id)) {
                 nameErrorMessage = "Category Name conflicts with existing products";
             }
 
             // Check if the slug already exists
-            if (existingCategoryBySlug != null && !existingCategoryBySlug.getId().equals(id)) {
+            if (existingCategoryBySlug != null
+                    && !existingCategoryBySlug.getId().equals(id)) {
                 slugErrorMessage = "Category Slug conflicts with existing products";
             }
         }
@@ -162,25 +168,18 @@ public class ProductCategoryService {
         return nameErrorMessage == null && slugErrorMessage == null;
     }
 
-
-
     public void restoreCategory(Integer id) throws ProductCategoryException {
-        ProductCategory restoreCategory=this.findById(id,null);
+        ProductCategory restoreCategory = this.findById(id, null);
         restoreCategory.setIsActive(true);
         restoreCategory.setDeletedAt(new Date());
         this.productCategoryRepository.save(restoreCategory);
     }
 
-
-
-    public ProductCategory setDataForProductCategory(ProductCategory productCategories, ProductCategory EditCategory)
-    {
+    public ProductCategory setDataForProductCategory(ProductCategory productCategories, ProductCategory EditCategory) {
         productCategories.setName(EditCategory.getName());
         productCategories.setSlug(EditCategory.getSlug());
         productCategories.setDescription(EditCategory.getDescription());
         productCategories.setUpdatedAt(new Date());
         return productCategories;
     }
-
-
 }

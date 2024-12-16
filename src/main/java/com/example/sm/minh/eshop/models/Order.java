@@ -1,13 +1,15 @@
 package com.example.sm.minh.eshop.models;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity(name = "orders")
 @Getter
@@ -38,29 +40,27 @@ public class Order {
     @Temporal(TemporalType.TIMESTAMP)
     private Boolean status;
 
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "users_id")
     private User userId;
 
     public Order() {
-        this.taxAmount=0;
-        this.totalAmount=0f;
-        this.countItem =0;
-        this.createdAt=new Date();
-        this.status=false;
+        this.taxAmount = 0;
+        this.totalAmount = 0f;
+        this.countItem = 0;
+        this.createdAt = new Date();
+        this.status = false;
     }
 
     @Override
     public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", taxAmount=" + taxAmount +
-                ", totalAmount=" + totalAmount +
-                ", countItems=" + countItem +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", status=" + status +
-                '}';
+        return "Order{" + "id="
+                + id + ", taxAmount="
+                + taxAmount + ", totalAmount="
+                + totalAmount + ", countItems="
+                + countItem + ", createdAt="
+                + createdAt + ", updatedAt="
+                + updatedAt + ", status="
+                + status + '}';
     }
 }

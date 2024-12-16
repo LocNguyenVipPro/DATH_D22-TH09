@@ -18,8 +18,8 @@
     </head>
     <body>
         <div th:fragment="Navbar">
-                    <nav id="navbar" class="relative py-4 border border-gray-100 sticky pb-2 w-full z-50 fixed top-0  transition-transform duration-300 transform bg-blue-300" >
-                    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <nav id="navbar" class="relative py-4 border border-gray-700 sticky pb-2 w-full z-50 fixed top-0 transition-transform duration-300 transform bg-gray-800 shadow-md text-gray-300">
+                <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                         <div class="relative flex items-center justify-between" style="height:100px">
                             <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
                                 <!-- Mobile menu button-->
@@ -38,10 +38,17 @@
                             </div>
                             <div class="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
                                 <a th:href="@{/main-page}">
-                                    <div class="flex-shrink-0 flex items-center">
-                                        <img class="h-24 w-full" th:src="@{/images/2.png}" alt="Your Company">
-                                        <h1 class="text-3xl normal-case font-bold  text-black-600 uppercase tracking-widest">DN.SHOP</h1>
+                                    <div class="flex-shrink-0 flex items-center space-x-3">
+                                        <div class="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3a1 1 0 001 1h2a1 1 0 100-2h-1V7z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 uppercase tracking-widest hover:scale-105 transition-transform duration-300">
+                                            TechZone
+                                        </h1>
                                     </div>
+
                                 </a>
                             </div>
                             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
@@ -101,8 +108,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    </nav>
+                </div>
+            </nav>
                 <script th:src="@{/javascripts/fragment/navigation.js}" type="text/javascript"></script>
         </div>
 
@@ -160,11 +167,11 @@
                     <h2 class="uppercase tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl mb-8">Thank You for Visiting</h2>
 
                     <p class="mt-8 mb-8">
-                        We extend our heartfelt thanks to you for taking the time to visit our store. SDN is committed to providing the finest quality technology products along with attentive and professional customer service.
+                        Chúng tôi xin gửi lời cảm ơn chân thành đến bạn vì đã dành thời gian ghé thăm cửa hàng của chúng tôi. TechZone cam kết mang đến những sản phẩm công nghệ chất lượng hàng đầu cùng với dịch vụ khách hàng tận tâm và chuyên nghiệp.
                     </p>
 
                     <p class="mb-8">
-                        Here at SDN, we specialize in offering a wide range of cutting-edge technological products to meet your needs. Our goal is to enhance your digital experience and make technology more accessible to everyone.
+                        Tại TechZone, chúng tôi tự hào mang đến cho bạn một loạt các sản phẩm công nghệ tiên tiến, đáp ứng mọi nhu cầu của bạn. Sứ mệnh của chúng tôi là nâng tầm trải nghiệm số và đưa công nghệ đến gần hơn với tất cả mọi người.
                     </p>
                 </div>
             </section>

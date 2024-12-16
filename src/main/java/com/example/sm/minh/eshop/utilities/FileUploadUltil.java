@@ -1,15 +1,16 @@
 package com.example.sm.minh.eshop.utilities;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class FileUploadUltil {
-    public static void saveFile(String uploadDir, String fileName, MultipartFile multipartFile, String oldFileName) throws IOException {
+    public static void saveFile(String uploadDir, String fileName, MultipartFile multipartFile, String oldFileName)
+            throws IOException {
         Path uploadPath = Paths.get(uploadDir);
 
         if (!Files.exists(uploadPath)) {

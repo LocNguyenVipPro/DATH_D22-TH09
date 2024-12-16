@@ -1,11 +1,11 @@
 package com.example.sm.minh.eshop.validators.annotations;
 
-import com.example.sm.minh.eshop.validators.constraints.UniqueSlugAndNameConstraint;
+import java.lang.annotation.*;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.*;
-
+import com.example.sm.minh.eshop.validators.constraints.UniqueSlugAndNameConstraint;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -13,10 +13,14 @@ import java.lang.annotation.*;
 @Documented
 public @interface SlugAndNameUnique {
     String message() default "";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
-    String nameField()default "";
-    String idField()default "";
-    String SlugField()default "";
+    String nameField() default "";
+
+    String idField() default "";
+
+    String SlugField() default "";
 }

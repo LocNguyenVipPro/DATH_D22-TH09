@@ -1,11 +1,13 @@
 package com.example.sm.minh.eshop.models;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter

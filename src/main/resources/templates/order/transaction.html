@@ -13,9 +13,16 @@
     </div>
 </div>
 <div th:if="${listOrderLineItem.size()!=0}" >
-    <div class="mt-16">
-        <h1 class="text-7xl text-center mt-5 text-lg font-bold mb-4 "><b>Lịch sử giao dịch</b></h1>
+    <div class="mt-16 text-center">
+        <div class="mt-16 text-center">
+            <h1 class="text-6xl font-serif font-bold text-gray-900 uppercase tracking-wide">
+                <span class="text-yellow-500">Lịch sử</span> giao dịch
+            </h1>
+            <p class="text-lg text-gray-500 mt-2 italic">Theo dõi chi tiết các giao dịch của bạn</p>
+        </div>
+
     </div>
+
 </div>
 <form th:action="@{/cart/checkout}" method="post">
     <div th:if="${listOrderLineItem.size()!=0}" class="bg-gray-100 h-screen py-8">

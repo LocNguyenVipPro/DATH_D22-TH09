@@ -1,13 +1,15 @@
 package com.example.sm.minh.eshop.models;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -53,26 +55,24 @@ public class CartLineItem {
 
     @Override
     public String toString() {
-        return "CartLineItems{" +
-                "id=" + id +
-                ", quantity=" + quantity +
-                ", totalAmount=" + totalAmount +
-                ", subTotalAmount=" + subTotalAmount +
-                ", taxTotalAmount=" + taxTotalAmount +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", cartId=" + cartId +
-                ", productId=" + productId +
-                '}';
+        return "CartLineItems{" + "id="
+                + id + ", quantity="
+                + quantity + ", totalAmount="
+                + totalAmount + ", subTotalAmount="
+                + subTotalAmount + ", taxTotalAmount="
+                + taxTotalAmount + ", createdAt="
+                + createdAt + ", updatedAt="
+                + updatedAt + ", cartId="
+                + cartId + ", productId="
+                + productId + '}';
     }
 
     public CartLineItem() {
 
-        this.quantity=0;
-        this.totalAmount=0;
-        this.subTotalAmount=0;
-        this.taxTotalAmount=0;
-        this.createdAt=new Date();
+        this.quantity = 0;
+        this.totalAmount = 0;
+        this.subTotalAmount = 0;
+        this.taxTotalAmount = 0;
+        this.createdAt = new Date();
     }
-
 }

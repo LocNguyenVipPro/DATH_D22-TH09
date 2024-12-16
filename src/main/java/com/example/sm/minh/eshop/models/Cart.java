@@ -1,13 +1,15 @@
 package com.example.sm.minh.eshop.models;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -31,10 +33,12 @@ public class Cart {
 
     @Column(name = "deleted_at")
     private Date deletedAt;
+
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdAt;
+
     @Column(name = "is_active")
     private Boolean isActive;
 
@@ -43,26 +47,23 @@ public class Cart {
     private User user;
 
     public Cart() {
-        this.countItem =0;
-        this.createdAt=new Date();
-        this.taxAmount =0;
-        this.totalAmount =0f;
-
-
+        this.countItem = 0;
+        this.createdAt = new Date();
+        this.taxAmount = 0;
+        this.totalAmount = 0f;
     }
 
     @Override
     public String toString() {
-        return "Cart{" +
-                "id=" + id +
-                ", tax_amount=" + taxAmount +
-                ", total_amount=" + totalAmount +
-                ", count_items=" + countItem +
-                ", updatedAt=" + updatedAt +
-                ", deletedAt=" + deletedAt +
-                ", createdAt=" + createdAt +
-                ", isActive=" + isActive +
-                ", usersId=" + user +
-                '}';
+        return "Cart{" + "id="
+                + id + ", tax_amount="
+                + taxAmount + ", total_amount="
+                + totalAmount + ", count_items="
+                + countItem + ", updatedAt="
+                + updatedAt + ", deletedAt="
+                + deletedAt + ", createdAt="
+                + createdAt + ", isActive="
+                + isActive + ", usersId="
+                + user + '}';
     }
 }
