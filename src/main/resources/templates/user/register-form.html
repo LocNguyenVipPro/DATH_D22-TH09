@@ -130,6 +130,8 @@
                     <label for="active" class="ml-2">Acitve</label>
                 </div>
                 <div class="flex flex-col gap-y-3">
+                    <div th:if="${isNewUser}">
+
                     <select id="productCategories" th:field="*{role}" name="productCategories" size="5"
                             class="mt-1 block w-full px-5 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         <option value="" disabled selected>-- Chọn Role --</option>
@@ -137,6 +139,7 @@
                             <option th:value="${role.id}" th:text="${role.name}"></option>
                         </th:block>
                     </select>
+                    </div>
                 </div>
 
                 <div class="mt-6">
