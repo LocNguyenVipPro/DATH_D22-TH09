@@ -2,7 +2,7 @@
   <configuration default="false" name="MyShopDakNongApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="MyShopDakNong" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.sm.minh.eshop.MyShopDakNongApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.locnguyen.techzone.MyShopDakNongApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="false" />
